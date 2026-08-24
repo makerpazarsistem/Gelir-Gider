@@ -1388,7 +1388,7 @@
         // FIREBASE
         // ============================================================
 
-              const firebaseConfig = {
+     const firebaseConfig = {
   apiKey: "AIzaSyAb_2EMlUN-Kj0U24lDNhMVb91khnRa9fQ",
   authDomain: "gelirgideryonetimi-4a479.firebaseapp.com",
   databaseURL: "https://gelirgideryonetimi-4a479-default-rtdb.firebaseio.com",
@@ -1424,11 +1424,13 @@
 
 
         // ============================================================
-        // BAKİYE
+        // BAKİYE - SADECE MANUEL
         // ============================================================
 
         let currentBalance = 0;
         let fixedBalance = 0;
+        let isManualMode = false;
+        let manualBaseBalance = 0;
 
 
         const balanceBadge =
@@ -1471,6 +1473,92 @@
 
             fixedBalanceDisplay.textContent =
                 formatAmount(balance) + ' ₺';
+        }
+
+
+        // ============================================================
+        // BAKİYE HESAPLAMA
+        // ============================================================
+
+        function calculateBalance() {
+
+            let totalNakitGelir = 0;
+
+            salesData.forEach(item => {
+
+                if (item.odeme === 'Nakit') {
+
+                    totalNakitGelir +=
+                        parseFloat(item.tutar) || 0;
+                }
+            });
+
+
+            let totalGider = 0;
+
+            expenseData.forEach(item => {
+
+                totalGider +=
+                    parseFloat(item.tutar) || 0;
+            });
+
+
+            if (isManualMode) {
+
+                return manualBaseBalance +
+                    totalNakitGelir -
+                    totalGider;
+
+            } else {
+
+                return totalNakitGelir -
+                    totalGider;
+            }
+        }
+
+
+        function refreshBalance() {
+
+            const newBalance =
+                calculateBalance();
+
+            currentBalance = newBalance;
+
+            updateBalanceDisplay(
+                currentBalance
+            );
+
+
+            // Firebase'e sadece balance'ı güncelle
+            balanceRef.update({
+
+                balance: currentBalance,
+
+                updatedAt:
+                    firebase.database
+                        .ServerValue
+                        .TIMESTAMP
+            });
+
+
+            // Sabit bakiyeyi güncelle
+            fixedBalance =
+                totalNakitGelir - totalGider;
+
+            updateFixedBalanceDisplay(
+                fixedBalance
+            );
+
+
+            fixedBalanceRef.set({
+
+                balance: fixedBalance,
+
+                updatedAt:
+                    firebase.database
+                        .ServerValue
+                        .TIMESTAMP
+            });
         }
 
 
@@ -1573,59 +1661,7 @@
 
 
         // ============================================================
-        // SABİT BAKİYE HESAPLAMA
-        // ============================================================
-
-        function calculateFixedBalance() {
-
-            let totalNakitGelir = 0;
-
-            salesData.forEach(item => {
-
-                if (item.odeme === 'Nakit') {
-
-                    totalNakitGelir +=
-                        parseFloat(item.tutar) || 0;
-                }
-            });
-
-
-            let totalGider = 0;
-
-            expenseData.forEach(item => {
-
-                totalGider +=
-                    parseFloat(item.tutar) || 0;
-            });
-
-
-            return totalNakitGelir - totalGider;
-        }
-
-
-        function updateFixedBalance() {
-
-            fixedBalance =
-                calculateFixedBalance();
-
-            updateFixedBalanceDisplay(
-                fixedBalance
-            );
-
-            fixedBalanceRef.set({
-
-                balance: fixedBalance,
-
-                updatedAt:
-                    firebase.database
-                        .ServerValue
-                        .TIMESTAMP
-            });
-        }
-
-
-        // ============================================================
-        // BAKİYE KAYDETME
+        // BAKİYE KAYDETME (MANUEL)
         // ============================================================
 
         const editBalanceModal =
@@ -1664,20 +1700,24 @@
                     }
 
 
-                    currentBalance = val;
+                    // Manuel moda geç
+                    isManualMode = true;
 
-                    updateBalanceDisplay(
-                        currentBalance
-                    );
-
-                    editBalanceModal
-                        .classList
-                        .remove('active');
+                    manualBaseBalance = val;
 
 
+                    // Bakiyeyi güncelle
+                    refreshBalance();
+
+
+                    // Firebase'e manuel mod bilgilerini kaydet
                     balanceRef.set({
 
                         balance: currentBalance,
+
+                        isManual: true,
+
+                        manualBase: val,
 
                         updatedAt:
                             firebase.database
@@ -1686,10 +1726,15 @@
                     });
 
 
+                    editBalanceModal
+                        .classList
+                        .remove('active');
+
+
                     setSyncStatus(
                         '✅ Bakiye ' +
-                        formatAmount(currentBalance) +
-                        ' ₺ olarak ayarlandı',
+                        formatAmount(val) +
+                        ' ₺ olarak ayarlandı (Manuel)',
                         'success'
                     );
                 }
@@ -1737,6 +1782,9 @@
             document.getElementById('salesRowCount');
 
         let salesData = [];
+
+        let totalNakitGelir = 0;
+        let totalGider = 0;
 
 
         function renderSales() {
@@ -1851,7 +1899,17 @@
 
                                 salesRef
                                     .child(id)
-                                    .remove();
+                                    .remove()
+                                    .then(() => {
+
+                                        // Silme işleminden sonra bakiyeyi güncelle
+                                        setTimeout(
+                                            () => {
+                                                refreshBalance();
+                                            },
+                                            300
+                                        );
+                                    });
                             }
                         }
                     );
@@ -1860,6 +1918,19 @@
 
             salesRowCount.textContent =
                 salesData.length + ' satır';
+
+
+            // Toplam nakit geliri hesapla
+            totalNakitGelir = 0;
+
+            salesData.forEach(item => {
+
+                if (item.odeme === 'Nakit') {
+
+                    totalNakitGelir +=
+                        parseFloat(item.tutar) || 0;
+                }
+            });
         }
 
 
@@ -1895,7 +1966,8 @@
 
             renderSales();
 
-            updateFixedBalance();
+            // Bakiyeyi güncelle
+            refreshBalance();
 
             setSyncStatus(
                 '✅ ' +
@@ -2047,30 +2119,6 @@
                             )
                             .value =
                             getToday();
-
-
-                        if (
-                            odeme === 'Nakit'
-                        ) {
-
-                            currentBalance +=
-                                tutar;
-
-                            updateBalanceDisplay(
-                                currentBalance
-                            );
-
-                            balanceRef.set({
-
-                                balance:
-                                    currentBalance,
-
-                                updatedAt:
-                                    firebase.database
-                                        .ServerValue
-                                        .TIMESTAMP
-                            });
-                        }
                     });
                 }
             );
@@ -2094,7 +2142,16 @@
                         )
                     ) {
 
-                        salesRef.remove();
+                        salesRef.remove()
+                            .then(() => {
+
+                                setTimeout(
+                                    () => {
+                                        refreshBalance();
+                                    },
+                                    300
+                                );
+                            });
                     }
                 }
             );
@@ -2257,7 +2314,16 @@
 
                                 expenseRef
                                     .child(id)
-                                    .remove();
+                                    .remove()
+                                    .then(() => {
+
+                                        setTimeout(
+                                            () => {
+                                                refreshBalance();
+                                            },
+                                            300
+                                        );
+                                    });
                             }
                         }
                     );
@@ -2267,6 +2333,16 @@
             expenseRowCount.textContent =
                 expenseData.length +
                 ' satır';
+
+
+            // Toplam gideri hesapla
+            totalGider = 0;
+
+            expenseData.forEach(item => {
+
+                totalGider +=
+                    parseFloat(item.tutar) || 0;
+            });
         }
 
 
@@ -2302,7 +2378,8 @@
 
             renderExpenses();
 
-            updateFixedBalance();
+            // Bakiyeyi güncelle
+            refreshBalance();
         });
 
 
@@ -2438,27 +2515,6 @@
                             )
                             .value =
                             getToday();
-
-
-                        currentBalance -=
-                            tutar;
-
-
-                        updateBalanceDisplay(
-                            currentBalance
-                        );
-
-
-                        balanceRef.set({
-
-                            balance:
-                                currentBalance,
-
-                            updatedAt:
-                                firebase.database
-                                    .ServerValue
-                                    .TIMESTAMP
-                        });
                     });
                 }
             );
@@ -2482,7 +2538,16 @@
                         )
                     ) {
 
-                        expenseRef.remove();
+                        expenseRef.remove()
+                            .then(() => {
+
+                                setTimeout(
+                                    () => {
+                                        refreshBalance();
+                                    },
+                                    300
+                                );
+                            });
                     }
                 }
             );
@@ -3456,7 +3521,24 @@
                             formatAmount(
                                 fixedBalance
                             )
-                        ]
+                        ],
+
+                        [''],
+                        [
+                            'Bakiye Modu',
+                            isManualMode ?
+                                'Manuel' :
+                                'Otomatik'
+                        ],
+
+                        isManualMode ?
+                            [
+                                'Manuel Başlangıç',
+                                formatAmount(
+                                    manualBaseBalance
+                                )
+                            ] :
+                            []
                     ];
 
 
@@ -3507,6 +3589,7 @@
             getToday();
 
 
+        // Firebase'den manuel mod bilgisini al
         balanceRef.on(
             'value',
             (snapshot) => {
@@ -3520,6 +3603,11 @@
                     currentBalance =
                         data.balance || 0;
 
+                    isManualMode =
+                        data.isManual || false;
+
+                    manualBaseBalance =
+                        data.manualBase || 0;
 
                     updateBalanceDisplay(
                         currentBalance
@@ -3541,7 +3629,6 @@
 
                     fixedBalance =
                         data.balance || 0;
-
 
                     updateFixedBalanceDisplay(
                         fixedBalance
@@ -3567,6 +3654,10 @@
 
         console.log(
             '✅ IBAN/Not alanlarına tıklayarak büyütebilirsiniz.'
+        );
+
+        console.log(
+            '✅ Gelir/Gider silindiğinde bakiye otomatik güncellenir.'
         );
 
     </script>
