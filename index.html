@@ -1,3666 +1,1296 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kasa Yönetimi</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
-    <style>
-        body {
-            background: #f4f7fc;
-            padding: 2rem 0;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-        }
-
-        .card {
-            border-radius: 24px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
-            border: none;
-            background: white;
-        }
-
-        .card-header {
-            background: white;
-            border-bottom: 1px solid #eef2f6;
-            padding: 1.5rem 1.5rem 0.5rem 1.5rem;
-            font-weight: 600;
-            font-size: 1.2rem;
-            border-radius: 24px 24px 0 0 !important;
-        }
-
-        .nav-pills .nav-link {
-            border-radius: 40px;
-            color: #475569;
-            font-weight: 500;
-            padding: 0.5rem 1.2rem;
-        }
-
-        .nav-pills .nav-link.active {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .nav-pills .nav-link i {
-            margin-right: 6px;
-        }
-
-        .form-label {
-            font-weight: 500;
-            color: #1e293b;
-            font-size: 0.9rem;
-        }
-
-        .form-control,
-        .form-select {
-            border-radius: 14px;
-            border: 1px solid #dce2ec;
-            padding: 0.6rem 1rem;
-            background: white;
-            font-size: 0.95rem;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
-        }
-
-        .btn {
-            border-radius: 40px;
-            padding: 0.5rem 1.8rem;
-            font-weight: 500;
-        }
-
-        .btn-primary {
-            background: #3b82f6;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-
-        .btn-outline-secondary {
-            border: 1px solid #dce2ec;
-            color: #475569;
-        }
-
-        .btn-outline-secondary:hover {
-            background: #f1f5f9;
-            border-color: #b9c7da;
-        }
-
-        .btn-danger {
-            background: #ef4444;
-            border: none;
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
-        .btn-success {
-            background: #10b981;
-            border: none;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-        }
-
-        .table-responsive {
-            border-radius: 16px;
-            border: 1px solid #edf2f7;
-        }
-
-        .product-badge {
-            background: #eef2ff;
-            color: #4338ca;
-            padding: 0.25rem 0.75rem;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            display: inline-block;
-        }
-
-        .type-badge {
-            font-weight: 500;
-            padding: 0.25rem 0.9rem;
-            border-radius: 30px;
-            font-size: 0.75rem;
-        }
-
-        .type-badge.havale {
-            background: #dbeafe;
-            color: #1e4f8a;
-        }
-
-        .type-badge.nakit {
-            background: #e2e8f0;
-            color: #334155;
-        }
-
-        .row-count-badge {
-            background: #f1f5f9;
-            padding: 0.2rem 1rem;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            color: #475569;
-        }
-
-        footer {
-            color: #94a3b8;
-            font-size: 0.8rem;
-        }
-
-        .tab-pane {
-            padding-top: 1.2rem;
-        }
-
-        .section-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 0.25rem;
-        }
-
-        .recipient-tag {
-            background: #e6f0ff;
-            border-radius: 30px;
-            padding: 0.15rem 0.8rem;
-            font-size: 0.8rem;
-            display: inline-block;
-            cursor: pointer;
-            transition: 0.15s;
-            border: 1px solid transparent;
-            margin: 0.1rem;
-        }
-
-        .recipient-tag:hover {
-            background: #c7d9f7;
-            border-color: #3b82f6;
-        }
-
-        .expense-quick-tag {
-            background: #fee2e2;
-            border-radius: 30px;
-            padding: 0.15rem 0.8rem;
-            font-size: 0.8rem;
-            display: inline-block;
-            cursor: pointer;
-            transition: 0.15s;
-            border: 1px solid transparent;
-            margin: 0.1rem;
-        }
-
-        .expense-quick-tag:hover {
-            background: #fecaca;
-            border-color: #ef4444;
-        }
-
-        .management-tag {
-            background: #f1f5f9;
-            border-radius: 30px;
-            padding: 0.3rem 0.8rem;
-            font-size: 0.8rem;
-            display: inline-block;
-            border: 1px solid #e2e8f0;
-            margin: 0.1rem;
-        }
-
-        .management-tag .remove-tag {
-            cursor: pointer;
-            color: #ef4444;
-            margin-left: 6px;
-            font-weight: bold;
-        }
-
-        .management-tag .remove-tag:hover {
-            color: #dc2626;
-        }
-
-        .bank-info {
-            font-size: 0.7rem;
-            color: #3b82f6;
-            background: #dbeafe;
-            padding: 0.1rem 0.5rem;
-            border-radius: 20px;
-            display: inline-block;
-            cursor: pointer;
-            transition: 0.15s;
-        }
-
-        .bank-info:hover {
-            background: #bfdbfe;
-        }
-
-        .sync-status {
-            font-size: 0.8rem;
-            padding: 0.2rem 1rem;
-            border-radius: 30px;
-            background: #d1e7dd;
-            color: #0f5132;
-        }
-
-        .sync-status.syncing {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .sync-status.error {
-            background: #f8d7da;
-            color: #842029;
-        }
-
-        .firebase-badge {
-            background: #ffca28;
-            color: #202124;
-            padding: 0.2rem 0.8rem;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        /* ============================================================
-           SAĞ ÜST BAKİYE SAYACI
-           ============================================================ */
-
-        .balance-counter {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            left: auto;
-
-            z-index: 9999;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-
-            background: #0f172a;
-            color: #4ade80;
-
-            padding: 8px 18px;
-            min-height: 40px;
-
-            border-radius: 40px;
-
-            font-size: 0.95rem;
-            font-weight: 600;
-
-            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.18);
-
-            cursor: pointer;
-            user-select: none;
-
-            transition: all 0.2s ease;
-        }
-
-        .balance-counter i {
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-
-        .balance-counter:hover {
-            transform: translateY(-1px);
-            background: #1e293b;
-            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
-        }
-
-        .balance-counter:active {
-            transform: scale(0.97);
-        }
-
-        @media (max-width: 576px) {
-            .balance-counter {
-                top: 10px;
-                right: 10px;
-                left: auto;
-
-                padding: 8px 15px;
-                min-height: 40px;
-
-                font-size: 0.9rem;
-            }
-
-            .balance-counter i {
-                font-size: 0.85rem;
-            }
-        }
-
-        /* ============================================================
-           IBAN MODAL
-           ============================================================ */
-
-        .iban-modal-overlay {
-            display: none;
-
-            position: fixed;
-            top: 0;
-            left: 0;
-
-            width: 100%;
-            height: 100%;
-
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-
-            z-index: 10001;
-
-            justify-content: center;
-            align-items: center;
-
-            animation: fadeIn 0.25s ease;
-        }
-
-        .iban-modal-overlay.active {
-            display: flex;
-        }
-
-        .iban-modal-box {
-            background: white;
-
-            padding: 2.5rem 3rem;
-
-            border-radius: 24px;
-
-            max-width: 700px;
-            width: 90%;
-
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-
-            position: relative;
-
-            animation: slideUp 0.3s ease;
-        }
-
-        .iban-modal-box .close-btn {
-            position: absolute;
-            top: 16px;
-            right: 20px;
-
-            font-size: 1.8rem;
-
-            cursor: pointer;
-
-            color: #94a3b8;
-
-            transition: 0.2s;
-
-            background: none;
-            border: none;
-        }
-
-        .iban-modal-box .close-btn:hover {
-            color: #1e293b;
-        }
-
-        .iban-modal-box .iban-label {
-            font-size: 0.8rem;
-            color: #64748b;
-
-            text-transform: uppercase;
-            letter-spacing: 1px;
-
-            margin-bottom: 0.25rem;
-        }
-
-        .iban-modal-box .iban-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #0f172a;
-
-            margin-bottom: 0.5rem;
-        }
-
-        .iban-modal-box .iban-content {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: #1e293b;
-
-            background: #f1f5f9;
-
-            padding: 1.2rem 1.5rem;
-
-            border-radius: 14px;
-
-            word-break: break-all;
-
-            font-family: 'Courier New', monospace;
-            letter-spacing: 1px;
-
-            margin-top: 0.5rem;
-
-            border: 2px dashed #dce2ec;
-
-            user-select: all;
-            cursor: pointer;
-        }
-
-        .iban-modal-box .iban-content:hover {
-            background: #e9edf4;
-            border-color: #3b82f6;
-        }
-
-        .iban-modal-box .copy-hint {
-            font-size: 0.75rem;
-            color: #94a3b8;
-
-            margin-top: 0.5rem;
-
-            text-align: center;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        /* ============================================================
-           BAKİYE DÜZENLEME MODAL
-           ============================================================ */
-
-        .edit-balance-modal-overlay {
-            display: none;
-
-            position: fixed;
-            top: 0;
-            left: 0;
-
-            width: 100%;
-            height: 100%;
-
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(3px);
-
-            z-index: 10000;
-
-            justify-content: center;
-            align-items: center;
-        }
-
-        .edit-balance-modal-overlay.active {
-            display: flex;
-        }
-
-        .edit-balance-modal-box {
-            background: white;
-
-            padding: 2rem;
-
-            border-radius: 20px;
-
-            max-width: 450px;
-            width: 90%;
-
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .edit-balance-modal-box .warning-text {
-            font-size: 0.85rem;
-            color: #dc2626;
-
-            background: #fee2e2;
-
-            padding: 0.5rem 0.8rem;
-
-            border-radius: 10px;
-
-            margin-top: 0.5rem;
-        }
-
-        .edit-balance-modal-box .info-text {
-            font-size: 0.85rem;
-            color: #64748b;
-        }
-
-        .edit-balance-modal-box .fixed-balance-info {
-            background: #f1f5f9;
-
-            padding: 0.8rem 1rem;
-
-            border-radius: 12px;
-
-            margin-top: 0.75rem;
-
-            border-left: 4px solid #fbbf24;
-        }
-
-        .edit-balance-modal-box .fixed-balance-info .label {
-            font-size: 0.7rem;
-            color: #64748b;
-
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .edit-balance-modal-box .fixed-balance-info .amount {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #f59e0b;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kasa Yönetimi — makerpazar</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<style>
+  :root{
+    --brand:#533DA1; --brand-2:#6B53C9; --brand-soft:#EEEAFB; --brand-ink:#2E2160;
+    --ink:#1E1B2E; --ink-2:#4A4660; --mute:#8A86A0; --line:#E3E0EE;
+    --bg:#F5F3FA; --card:#FFFFFF;
+    --in:#1F9D6B; --in-soft:#E5F6EE; --out:#D64545; --out-soft:#FDECEC; --warn:#D9822B; --warn-soft:#FFF3E3;
+    --radius:14px; --shadow:0 1px 2px rgba(30,27,46,.05),0 8px 24px -8px rgba(30,27,46,.12);
+    --f-head:'Poppins',system-ui,sans-serif; --f-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+    --f-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:var(--f-body);color:var(--ink);line-height:1.5;min-height:100vh;background:var(--bg);
+    background-image:radial-gradient(circle at 1px 1px,rgba(83,61,161,.09) 1px,transparent 0);background-size:22px 22px
+  }
+  button{font-family:inherit}
+  .num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+  /* ---------- Üst bar ---------- */
+  .topbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .topbar-inner{max-width:1280px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:18px}
+  .brand-logo{height:34px;display:block}
+  .topbar .divider{width:1px;height:28px;background:var(--line)}
+  .topbar h1{font-family:var(--f-head);font-size:1rem;font-weight:600}
+  .topbar .sub{font-size:.8rem;color:var(--mute)}
+  .chip{margin-left:auto;display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--brand-soft);color:var(--brand);font-size:.78rem;font-weight:600;white-space:nowrap}
+  .chip .dot{width:7px;height:7px;border-radius:50%;background:var(--in);box-shadow:0 0 0 3px rgba(31,157,107,.18)}
+  .chip.wait .dot{background:#C9A227;box-shadow:0 0 0 3px rgba(201,162,39,.2);animation:pulse 1.2s infinite}
+  .chip.off{background:var(--out-soft);color:var(--out)}
+  .chip.off .dot{background:var(--out);box-shadow:0 0 0 3px rgba(214,69,69,.18)}
+  @keyframes pulse{50%{opacity:.35}}
+  .balance-counter{
+    display:inline-flex;align-items:center;gap:10px;padding:8px 8px 8px 16px;border-radius:999px;border:0;cursor:pointer;
+    background:var(--ink);color:#fff;box-shadow:0 6px 16px -6px rgba(30,27,46,.5);transition:transform .1s,background .15s
+  }
+  .balance-counter:hover{background:#000;transform:translateY(-1px)}
+  .balance-counter .lbl{font-size:.7rem;color:#A9A2C8;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+  .balance-counter .amt{font:700 1rem var(--f-mono);color:#7CF0B5}
+  .balance-counter .amt.neg{color:#FF9C9C}
+  .balance-counter .edit{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center}
+  .balance-counter .edit svg{width:13px;height:13px}
+  .mode-tag{font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:5px;background:rgba(255,255,255,.14);color:#E0DAFF;letter-spacing:.04em}
+
+  .wrap{max-width:1280px;margin:0 auto;padding:24px 24px 10px}
+
+  /* ---------- Özet kartları ---------- */
+  .stats-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+  .stats-head h2{font:600 1.05rem var(--f-head)}
+  .stats-head .spacer{flex:1}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .stat .t{font-size:.76rem;color:var(--mute);font-weight:600;letter-spacing:.03em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+  .stat .t i{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-style:normal}
+  .stat .t i svg{width:13px;height:13px}
+  .stat .v{font:700 1.45rem var(--f-mono);margin-top:8px;letter-spacing:-.01em;white-space:nowrap}
+  .stat .d{font-size:.76rem;color:var(--mute);margin-top:4px}
+  .stat .d b{font-family:var(--f-mono);font-weight:600;color:var(--ink-2)}
+  .stat.in .t i{background:var(--in-soft);color:var(--in)} .stat.in .v{color:var(--in)}
+  .stat.out .t i{background:var(--out-soft);color:var(--out)} .stat.out .v{color:var(--out)}
+  .stat.net .t i{background:var(--brand-soft);color:var(--brand)}
+  .stat.cash{background:linear-gradient(135deg,#2A2440,#18152A);border-color:#2A2440;color:#fff;cursor:pointer}
+  .stat.cash .t{color:#A9A2C8} .stat.cash .t i{background:rgba(255,255,255,.12);color:#7CF0B5}
+  .stat.cash .v{color:#7CF0B5} .stat.cash .d{color:#A9A2C8} .stat.cash .d b{color:#E0DAFF}
+  .stat.cash:hover{filter:brightness(1.1)}
+  .stat.cash::after{content:"";position:absolute;right:-40px;top:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(124,240,181,.16),transparent 70%)}
+
+  /* ---------- Sekmeler ---------- */
+  .tabs-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .tabs{display:inline-flex;padding:4px;border-radius:12px;background:#ECE8F7;gap:2px}
+  .tab{border:0;background:transparent;padding:9px 16px;border-radius:9px;font:600 .88rem var(--f-body);color:var(--ink-2);cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+  .tab svg{width:16px;height:16px}
+  .tab .c{font:600 .7rem var(--f-mono);padding:1px 7px;border-radius:99px;background:rgba(0,0,0,.06)}
+  .tab.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(30,27,46,.12)}
+  .tab[data-tab=sales].active svg{color:var(--in)}
+  .tab[data-tab=expense].active svg{color:var(--out)}
+  .tab[data-tab=management].active svg{color:var(--brand)}
+  .tab-pane{display:none}
+  .tab-pane.active{display:block;animation:fade .2s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .pane-grid{display:grid;grid-template-columns:minmax(320px,.8fr) minmax(0,1.6fr);gap:20px;align-items:start}
+
+  /* ---------- Kart ---------- */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .card-head{display:flex;align-items:center;gap:10px;padding:15px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .card-head h3{font:600 .98rem var(--f-head)}
+  .card-head .badge-dot{width:10px;height:10px;border-radius:3px}
+  .card-body{padding:18px 20px}
+  .card.form-in{border-top:3px solid var(--in)}
+  .card.form-out{border-top:3px solid var(--out)}
+
+  /* ---------- Form ---------- */
+  .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+  .full{grid-column:1/-1}
+  .field label{display:block;font-size:.78rem;font-weight:600;color:var(--ink-2);margin-bottom:6px}
+  .field label .opt{font-weight:500;color:var(--mute)}
+  .iw{position:relative;display:flex;align-items:center}
+  .iw svg.ico{position:absolute;left:12px;width:16px;height:16px;color:var(--mute);pointer-events:none}
+  .iw .pre{position:absolute;left:13px;font:600 .95rem var(--f-mono);color:var(--mute);pointer-events:none}
+  input[type=text],input[type=date],input[type=search],select{
+    width:100%;padding:10px 12px 10px 38px;border:1px solid var(--line);border-radius:10px;background:#FBFAFE;
+    font:500 .93rem var(--f-body);color:var(--ink);transition:border-color .15s,box-shadow .15s,background .15s;appearance:none
+  }
+  .plain input,.plain select{padding-left:12px}
+  select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A86A0' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer}
+  input.amount{font:700 1.15rem var(--f-mono);padding-top:11px;padding-bottom:11px}
+  input:focus,select:focus{outline:none;border-color:var(--brand-2);background:#fff;box-shadow:0 0 0 4px rgba(107,83,201,.14)}
+  input:disabled{background:#F3F2F7;color:var(--mute);cursor:not-allowed}
+  input::placeholder{color:#B4B0C6;font-weight:400}
+
+  .seg{display:grid;grid-template-columns:1fr 1fr;padding:3px;border-radius:10px;background:#F1EEF9;gap:3px}
+  .seg button{border:0;padding:8px;border-radius:8px;background:transparent;font:600 .86rem var(--f-body);color:var(--ink-2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+  .seg button svg{width:15px;height:15px}
+  .seg button.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(30,27,46,.12)}
+  .seg button.active[data-v=Nakit]{color:var(--in)}
+  .seg button.active[data-v=Havale]{color:#2563A8}
+  .seg-hint{font-size:.72rem;color:var(--mute);margin-top:5px}
+
+  .quick{display:flex;flex-wrap:wrap;gap:6px}
+  .qtag{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;border:1px solid var(--line);background:#fff;font-size:.8rem;font-weight:500;color:var(--ink-2);cursor:pointer;transition:all .12s}
+  .qtag:hover{border-color:#CFC9E3;background:var(--brand-soft);color:var(--brand-ink)}
+  .qtag.exp:hover{background:var(--out-soft);border-color:#F1CACA;color:#A23333}
+  .qtag .a{font:600 .74rem var(--f-mono);color:var(--mute)}
+  .muted{color:var(--mute);font-size:.8rem}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:10px;border:1px solid transparent;font:600 .88rem var(--f-body);cursor:pointer;transition:transform .08s,background .15s,border-color .15s;white-space:nowrap}
+  .btn svg{width:16px;height:16px;flex:none}
+  .btn:active{transform:translateY(1px)}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+  .btn-primary{background:var(--brand);color:#fff;box-shadow:0 6px 16px -6px rgba(83,61,161,.6)}
+  .btn-primary:hover{background:var(--brand-ink)}
+  .btn-in{background:var(--in);color:#fff;box-shadow:0 6px 16px -6px rgba(31,157,107,.6)}
+  .btn-in:hover{background:#178459}
+  .btn-out{background:var(--out);color:#fff;box-shadow:0 6px 16px -6px rgba(214,69,69,.55)}
+  .btn-out:hover{background:#B93737}
+  .btn-ghost{background:#fff;color:var(--ink-2);border-color:var(--line)}
+  .btn-ghost:hover{border-color:#CFC9E3;background:#FAF9FD}
+  .btn-ghost.danger:hover{color:var(--out);border-color:#F1CACA;background:#FFF7F7}
+  .btn-excel{background:#1D6F42;color:#fff}
+  .btn-excel:hover{background:#155733}
+  .btn-sm{padding:7px 11px;font-size:.78rem;border-radius:8px}
+  .btn-sm svg{width:14px;height:14px}
+  .form-actions{display:flex;gap:8px;margin-top:4px}
+  .form-actions .btn:first-child{flex:1;padding:12px}
+  kbd{font:500 .68rem var(--f-mono);padding:2px 6px;border-radius:5px;background:rgba(255,255,255,.18)}
+
+  /* ---------- Liste ---------- */
+  .list-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-left:auto}
+  .list-tools .iw{width:220px}
+  .list-tools input{padding-top:8px;padding-bottom:8px;font-size:.85rem}
+  .row-count-badge{font:600 .74rem var(--f-mono);padding:6px 10px;border-radius:8px;background:#F3F1F9;color:var(--ink-2);white-space:nowrap}
+  .table-wrap{overflow:auto;max-height:560px}
+  table{width:100%;border-collapse:collapse;font-size:.86rem}
+  thead th{position:sticky;top:0;z-index:1;text-align:left;padding:10px 12px;background:#FAF9FD;color:var(--mute);font:600 .68rem var(--f-body);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--line);white-space:nowrap}
+  th.r,td.r{text-align:right}
+  td{padding:10px 12px;border-bottom:1px solid #F0EEF6;vertical-align:middle}
+  tbody tr:hover td{background:#FCFBFF}
+  td.idx{color:var(--mute);font:500 .76rem var(--f-mono);width:40px}
+  td.amt{font:700 .9rem var(--f-mono);white-space:nowrap;text-align:right}
+  td.amt.in{color:var(--in)} td.amt.out{color:var(--out)}
+  td.date{font:500 .78rem var(--f-mono);color:var(--ink-2);white-space:nowrap}
+  td.note{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink-2)}
+  td.strong{font-weight:600}
+  tfoot td{position:sticky;bottom:0;background:#FAF9FD;border-top:1px solid var(--line);border-bottom:0;font-weight:600;font-size:.8rem;color:var(--ink-2)}
+  .empty td{text-align:center;color:var(--mute);padding:40px 12px}
+  .dash{color:#C2BED3}
+  .product-badge{display:inline-block;padding:3px 9px;border-radius:7px;background:#F3F1F9;color:var(--ink);font-size:.8rem;font-weight:500}
+  .cat-badge{display:inline-block;padding:3px 9px;border-radius:7px;background:var(--out-soft);color:#A23333;font-size:.76rem;font-weight:600}
+  .type-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:.74rem;font-weight:600}
+  .type-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .type-badge.nakit{background:var(--in-soft);color:#17845A}
+  .type-badge.havale{background:#E3EEFB;color:#2563A8}
+  .icon-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--mute);display:grid;place-items:center;cursor:pointer;transition:all .12s}
+  .icon-btn svg{width:14px;height:14px}
+  .icon-btn:hover{color:var(--out);border-color:#F1CACA;background:#FFF7F7}
+
+  /* ---------- Yönetim ---------- */
+  .mgmt{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  .add-row{display:grid;gap:8px;margin-bottom:14px}
+  .add-row.r2{grid-template-columns:1fr 1.6fr auto}
+  .add-row.r5{grid-template-columns:1fr 1fr 110px}
+  .add-row.r5b{grid-template-columns:1fr 1fr auto}
+  .mlist{display:flex;flex-direction:column;gap:8px}
+  .management-tag{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#FCFBFF}
+  .management-tag .main{flex:1;min-width:0}
+  .management-tag .name{font-weight:600;font-size:.9rem}
+  .management-tag .meta{font-size:.78rem;color:var(--mute);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .management-tag .price{font:700 .9rem var(--f-mono);color:var(--out);white-space:nowrap}
+  .bank-info{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:3px 9px;border-radius:7px;background:#E3EEFB;color:#2563A8;font:500 .76rem var(--f-mono);cursor:pointer;border:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bank-info:hover{background:#D3E3F8}
+  .bank-info svg{width:12px;height:12px;flex:none}
+  .avatar{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;font:700 .8rem var(--f-head);background:var(--brand-soft);color:var(--brand)}
+  .avatar.exp{background:var(--out-soft);color:var(--out)}
+
+  /* ---------- Modallar ---------- */
+  .modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(20,16,36,.6);backdrop-filter:blur(4px)}
+  .modal.active{display:flex}
+  .modal-card{background:#fff;border-radius:18px;width:min(460px,100%);max-height:92vh;overflow:auto;box-shadow:0 30px 60px -20px rgba(0,0,0,.5);animation:pop .18s ease-out;position:relative}
+  .modal-card.wide{width:min(680px,100%)}
+  @keyframes pop{from{transform:scale(.97);opacity:0}to{transform:none;opacity:1}}
+  .modal-head{display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--line)}
+  .modal-head h3{font:600 1.02rem var(--f-head)}
+  .modal-head .x{margin-left:auto;width:34px;height:34px;border-radius:9px;border:0;background:#F3F1F9;color:var(--ink-2);font-size:20px;cursor:pointer}
+  .modal-body{padding:20px 22px}
+  .bal-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .bal-box{padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#FCFBFF}
+  .bal-box .l{font-size:.7rem;color:var(--mute);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+  .bal-box .a{font:700 1.2rem var(--f-mono);margin-top:4px}
+  .bal-box.fixed{border-left:4px solid #F2B84B}
+  .bal-box.fixed .a{color:#C27D0E}
+  .bal-box.cur{border-left:4px solid var(--in)}
+  .diff{font-size:.8rem;padding:8px 12px;border-radius:9px;background:var(--warn-soft);color:#9A5714;margin-bottom:14px;display:none}
+  .diff.show{display:block}
+  .info-text{font-size:.84rem;color:var(--ink-2);margin-bottom:12px}
+  .modal-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .modal-actions .btn-primary{flex:1}
+  .link-btn{border:0;background:none;color:var(--brand);font:600 .8rem var(--f-body);cursor:pointer;padding:0;margin-top:12px;text-decoration:underline;text-underline-offset:3px}
+
+  .iban-label{font-size:.72rem;color:var(--mute);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+  .iban-name{font:700 1.5rem var(--f-head);margin:4px 0 14px}
+  .iban-content{
+    font:600 1.6rem/1.4 var(--f-mono);letter-spacing:.04em;color:var(--ink);background:#F6F4FC;border:2px dashed #D6CEF2;border-radius:14px;
+    padding:18px 20px;word-break:break-all;user-select:all;cursor:pointer;transition:all .15s
+  }
+  .iban-content:hover{border-color:var(--brand-2);background:#F0ECFC}
+  .copy-hint{font-size:.76rem;color:var(--mute);text-align:center;margin-top:10px}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:200;background:var(--ink);color:#fff;padding:11px 18px;border-radius:10px;font-size:.86rem;font-weight:500;box-shadow:0 12px 30px -8px rgba(0,0,0,.4);transition:all .22s ease;max-width:calc(100vw - 32px)}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .toast.err{background:var(--out)}
+  footer{max-width:1280px;margin:0 auto;padding:16px 24px 30px;display:flex;justify-content:space-between;font-size:.78rem;color:var(--mute)}
+
+  @media (max-width:1080px){
+    .pane-grid{grid-template-columns:1fr}
+    .stats{grid-template-columns:1fr 1fr}
+    .mgmt{grid-template-columns:1fr}
+  }
+  @media (max-width:640px){
+    .wrap{padding:14px 12px 8px}
+    .topbar-inner{padding:10px 12px;gap:10px}
+    .topbar .sub,.topbar .divider,.topbar h1,.chip span:last-child{display:none}
+    .chip{margin-left:auto;padding:7px}
+    .brand-logo{height:26px}
+    .balance-counter .lbl{display:none}
+    .stats{gap:10px}
+    .stat{padding:12px 14px}
+    .stat .v{font-size:1.1rem}
+    .tabs{width:100%;display:grid;grid-template-columns:repeat(3,1fr)}
+    .tab{justify-content:center;padding:9px 6px;font-size:.82rem}
+    .tab .c{display:none}
+    .card-body{padding:14px}
+    .fgrid{grid-template-columns:1fr}
+    .list-tools{margin-left:0;width:100%}
+    .list-tools .iw{flex:1;width:auto}
+    .add-row.r2,.add-row.r5,.add-row.r5b{grid-template-columns:1fr}
+    /* tablo → kart */
+    .table-wrap{max-height:none}
+    thead{display:none}
+    table,tbody,tr,td,tfoot{display:block;width:100%}
+    tbody tr{padding:10px 14px;border-bottom:1px solid var(--line);position:relative}
+    td{border:0;padding:2px 0;display:flex;justify-content:space-between;gap:12px;text-align:right}
+    td::before{content:attr(data-label);color:var(--mute);font-size:.74rem;font-weight:500;text-align:left;flex:none}
+    td.idx{display:none}
+    td.amt{justify-content:space-between}
+    td.note{max-width:none;white-space:normal}
+    td.act{position:absolute;top:10px;right:12px;width:auto;padding:0}
+    td.act::before{content:none}
+    td:first-of-type + td{padding-right:40px}
+    tfoot tr{display:flex;justify-content:space-between;padding:10px 14px}
+    tfoot td{display:inline;width:auto;position:static}
+    tfoot td::before{content:none}
+    .stats-head .btn{flex:1}
+    footer{flex-direction:column;gap:4px;padding:12px 14px 24px}
+    .iban-content{font-size:1.15rem}
+  }
+</style>
 </head>
-
 <body>
 
-    <!-- ============================================================
-         SAĞ ÜST BAKİYE SAYACI
-         TIKLANINCA DÜZENLEME MENÜSÜ AÇILIR
-         ============================================================ -->
-
-    <div class="balance-counter" id="balanceCounter" onclick="openEditModal()" title="Bakiyeyi düzenle">
-
-        <i class="fas fa-wallet"></i>
-
-        <span id="balanceBadge">
-            0,00 ₺
-        </span>
-
+<header class="topbar">
+  <div class="topbar-inner">
+    <img class="brand-logo" alt="makerpazar" src="data:image/png;base64,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">
+    <span class="divider"></span>
+    <div>
+      <h1>Kasa Yönetimi</h1>
+      <div class="sub">Gelir · gider · nakit kasa takibi · Firebase senkron</div>
     </div>
+    <span class="chip wait" id="syncChip" title=""><span class="dot"></span><span id="syncStatus">Bağlanıyor…</span></span>
+    <button class="balance-counter" id="balanceCounter" title="Kasa bakiyesini düzenle" type="button">
+      <span class="lbl">Kasa</span>
+      <span class="amt" id="balanceBadge">0,00 ₺</span>
+      <span class="mode-tag" id="modeTag" hidden>MANUEL</span>
+      <span class="edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></span>
+    </button>
+  </div>
+</header>
 
+<div class="wrap">
 
-    <!-- ============================================================
-         IBAN MODAL
-         ============================================================ -->
+  <!-- ============ ÖZET ============ -->
+  <div class="stats-head">
+    <h2>Özet</h2>
+    <div class="iw plain" style="width:200px">
+      <select id="periodSelect" title="Özet ve listeleri döneme göre filtrele"><option value="">Tüm zamanlar</option></select>
+    </div>
+    <span class="spacer"></span>
+    <button class="btn btn-excel btn-sm" id="exportExcel" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M9 13l6 6M15 13l-6 6"/></svg>
+      Excel İndir
+    </button>
+  </div>
+  <div class="stats">
+    <div class="stat cash" id="cashStat" title="Bakiyeyi düzenle">
+      <div class="t"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M16 12h3M2 10h20"/></svg></i>Kasa (Nakit)</div>
+      <div class="v" id="statCash">0,00 ₺</div>
+      <div class="d" id="statCashSub">Otomatik hesaplanıyor</div>
+    </div>
+    <div class="stat in">
+      <div class="t"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></i>Gelir</div>
+      <div class="v" id="statIn">0,00 ₺</div>
+      <div class="d">Nakit <b id="statInCash">0,00</b> · Havale <b id="statInBank">0,00</b></div>
+    </div>
+    <div class="stat out">
+      <div class="t"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></i>Gider</div>
+      <div class="v" id="statOut">0,00 ₺</div>
+      <div class="d"><b id="statOutCount">0</b> kayıt</div>
+    </div>
+    <div class="stat net">
+      <div class="t"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg></i>Net</div>
+      <div class="v" id="statNet">0,00 ₺</div>
+      <div class="d">Gelir − gider (havale dahil)</div>
+    </div>
+  </div>
 
-    <div class="iban-modal-overlay" id="ibanModal">
+  <!-- ============ SEKMELER ============ -->
+  <div class="tabs-row">
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="sales" type="button" role="tab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Gelir <span class="c" id="tabSalesC">0</span>
+      </button>
+      <button class="tab" data-tab="expense" type="button" role="tab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>Gider <span class="c" id="tabExpC">0</span>
+      </button>
+      <button class="tab" data-tab="management" type="button" role="tab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Yönetim
+      </button>
+    </div>
+  </div>
 
-        <div class="iban-modal-box">
+  <!-- ============ GELİR ============ -->
+  <div class="tab-pane active" id="sales">
+    <div class="pane-grid">
+      <section class="card form-in">
+        <div class="card-head"><span class="badge-dot" style="background:var(--in)"></span><h3>Yeni Gelir</h3></div>
+        <div class="card-body">
+          <form id="salesForm" autocomplete="off" onsubmit="return false">
+            <div class="fgrid">
+              <div class="field full">
+                <label for="salesCustomer">Müşteri</label>
+                <div class="iw"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+                  <input type="text" id="salesCustomer" placeholder="Müşteri adı" list="customerList" /></div>
+                <datalist id="customerList"></datalist>
+              </div>
+              <div class="field full">
+                <label for="salesProduct">Ürün</label>
+                <div class="iw"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
+                  <input type="text" id="salesProduct" placeholder="Ürün adı" list="productList" /></div>
+                <datalist id="productList"></datalist>
+              </div>
+              <div class="field">
+                <label for="salesAmount">Tutar</label>
+                <div class="iw"><span class="pre">₺</span><input type="text" inputmode="decimal" class="amount" id="salesAmount" placeholder="0,00" /></div>
+              </div>
+              <div class="field">
+                <label for="salesDate">Tarih</label>
+                <div class="iw"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                  <input type="date" id="salesDate" /></div>
+              </div>
+              <div class="field full">
+                <label>Ödeme</label>
+                <select id="salesPayment" hidden><option value="Nakit">Nakit</option><option value="Havale">Havale</option></select>
+                <div class="seg" id="paySeg">
+                  <button type="button" data-v="Nakit" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>Nakit</button>
+                  <button type="button" data-v="Havale"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 10 12 4l9 6M5 10v8M19 10v8M9 10v8M15 10v8M3 20h18"/></svg>Havale</button>
+                </div>
+                <div class="seg-hint" id="payHint">Nakit gelir kasa bakiyesine eklenir.</div>
+              </div>
+              <div class="field full">
+                <label for="salesHavaleNote">Havale Alan Kişi</label>
+                <div class="quick" id="recipientTagsContainer" style="margin-bottom:8px"></div>
+                <div class="iw"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 10 12 4l9 6M5 10v8M19 10v8M3 20h18"/></svg>
+                  <input type="text" id="salesHavaleNote" placeholder="Havale alacak kişi bilgisi" /></div>
+              </div>
+              <div class="form-actions full">
+                <button type="button" class="btn btn-in" id="addSalesBtn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                  Gelir Ekle <kbd>Enter</kbd>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
 
-            <button class="close-btn" id="ibanModalClose">
-                &times;
+      <section class="card">
+        <div class="card-head">
+          <h3>Gelir Listesi</h3>
+          <div class="list-tools">
+            <div class="iw"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+              <input type="search" id="salesSearch" placeholder="Ara…" /></div>
+            <select id="salesPayFilter" class="plain" style="width:auto;padding-left:12px;padding-top:8px;padding-bottom:8px;font-size:.85rem">
+              <option value="">Tümü</option><option value="Nakit">Nakit</option><option value="Havale">Havale</option>
+            </select>
+            <span class="row-count-badge" id="salesRowCount">0 satır</span>
+            <button type="button" class="btn btn-ghost btn-sm danger" id="clearSalesBtn" title="Tüm gelir kayıtlarını sil">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>
             </button>
-
-            <div class="iban-label">
-                💳 HAVALE ALACAK KİŞİ
-            </div>
-
-            <div class="iban-name" id="ibanModalName">
-                -
-            </div>
-
-            <div class="iban-content" id="ibanModalContent">
-                -
-            </div>
-
-            <div class="copy-hint">
-                <i class="fas fa-mouse-pointer"></i>
-                Tıklayarak seçin, kopyalamak için Ctrl+C (Cmd+C)
-            </div>
-
+          </div>
         </div>
-
-    </div>
-
-
-    <div class="container" style="max-width: 1200px;">
-
-        <div class="card">
-
-            <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
-
-                <span>
-                    <i class="fas fa-chart-pie me-2 text-primary"></i>
-
-                    Kasa Yönetimi
-
-                    <span class="firebase-badge ms-2">
-                        <i class="fas fa-cloud me-1"></i>
-                        Firebase
-                    </span>
-                </span>
-
-                <span class="badge bg-light text-secondary" id="syncStatus">
-
-                    <i class="fas fa-sync me-1"></i>
-                    Senkronize
-
-                </span>
-
-            </div>
-
-
-            <div class="card-body p-4">
-
-                <!-- ====================================================
-                     SEKME MENÜSÜ
-                     ==================================================== -->
-
-                <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
-
-                    <li class="nav-item" role="presentation">
-
-                        <button class="nav-link active" id="sales-tab" data-bs-toggle="tab" data-bs-target="#sales" type="button"
-                            role="tab">
-
-                            <i class="fas fa-arrow-up text-success"></i>
-
-                            Gelir
-
-                        </button>
-
-                    </li>
-
-
-                    <li class="nav-item" role="presentation">
-
-                        <button class="nav-link" id="expense-tab" data-bs-toggle="tab" data-bs-target="#expense" type="button"
-                            role="tab">
-
-                            <i class="fas fa-arrow-down text-danger"></i>
-
-                            Gider
-
-                        </button>
-
-                    </li>
-
-
-                    <li class="nav-item" role="presentation">
-
-                        <button class="nav-link" id="management-tab" data-bs-toggle="tab" data-bs-target="#management" type="button"
-                            role="tab">
-
-                            <i class="fas fa-cog text-secondary"></i>
-
-                            Yönetim
-
-                        </button>
-
-                    </li>
-
-                </ul>
-
-
-                <div class="tab-content" id="myTabContent">
-
-
-                    <!-- ==================================================
-                         GELİR
-                         ================================================== -->
-
-                    <div class="tab-pane fade show active" id="sales" role="tabpanel">
-
-                        <div class="row g-4">
-
-                            <div class="col-lg-5">
-
-                                <div class="bg-light p-3 rounded-4">
-
-                                    <h6 class="section-title">
-
-                                        <i class="fas fa-pen-alt me-1 text-primary"></i>
-
-                                        Yeni Gelir
-
-                                    </h6>
-
-
-                                    <form id="salesForm">
-
-                                        <div class="row g-3">
-
-                                            <div class="col-md-12">
-
-                                                <label class="form-label">
-                                                    👤 Müşteri
-                                                </label>
-
-                                                <input type="text" class="form-control" id="salesCustomer"
-                                                    placeholder="Müşteri adı" />
-
-                                            </div>
-
-
-                                            <div class="col-md-6">
-
-                                                <label class="form-label">
-                                                    📦 Ürün
-                                                </label>
-
-                                                <input type="text" class="form-control" id="salesProduct"
-                                                    placeholder="Ürün adı" />
-
-                                            </div>
-
-
-                                            <div class="col-md-6">
-
-                                                <label class="form-label">
-                                                    🏷️ Ödeme
-                                                </label>
-
-                                                <select class="form-select" id="salesPayment">
-
-                                                    <option value="Nakit">
-                                                        Nakit
-                                                    </option>
-
-                                                    <option value="Havale">
-                                                        Havale
-                                                    </option>
-
-                                                </select>
-
-                                            </div>
-
-
-                                            <div class="col-md-6">
-
-                                                <label class="form-label">
-                                                    📅 Tarih
-                                                </label>
-
-                                                <input type="date" class="form-control" id="salesDate" />
-
-                                            </div>
-
-
-                                            <div class="col-md-6">
-
-                                                <label class="form-label">
-                                                    💰 Tutar (₺)
-                                                </label>
-
-                                                <div class="input-group">
-
-                                                    <span class="input-group-text bg-white border-end-0">
-                                                        ₺
-                                                    </span>
-
-                                                    <input type="number" class="form-control border-start-0" id="salesAmount"
-                                                        placeholder="0.00" step="0.01" />
-
-                                                </div>
-
-                                            </div>
-
-
-                                            <div class="col-12">
-
-                                                <label class="form-label">
-                                                    🏦 Havale Alan Kişi
-                                                </label>
-
-                                                <div class="d-flex flex-wrap gap-1 mb-2" id="recipientTagsContainer">
-                                                </div>
-
-                                                <input type="text" class="form-control" id="salesHavaleNote"
-                                                    placeholder="Havale alacak kişi bilgisi" />
-
-                                            </div>
-
-
-                                            <div class="col-12 d-flex gap-2 mt-2">
-
-                                                <button type="button" class="btn btn-primary" id="addSalesBtn">
-
-                                                    <i class="fas fa-plus me-1"></i>
-
-                                                    Ekle
-
-                                                </button>
-
-
-                                                <button type="button" class="btn btn-outline-secondary" id="clearSalesBtn">
-
-                                                    <i class="fas fa-trash-alt"></i>
-
-                                                </button>
-
-                                            </div>
-
-                                        </div>
-
-                                    </form>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="col-lg-7">
-
-                                <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
-
-                                    <h6 class="mb-0 fw-semibold">
-
-                                        <i class="fas fa-table me-1 text-secondary"></i>
-
-                                        Gelir Listesi
-
-                                    </h6>
-
-
-                                    <div class="search-box" style="flex:1; max-width:260px;">
-
-                                        <i class="fas fa-search"></i>
-
-                                        <input type="text" class="form-control" id="salesSearch" placeholder="Ara..." />
-
-                                    </div>
-
-
-                                    <span class="row-count-badge" id="salesRowCount">
-
-                                        0 satır
-
-                                    </span>
-
-                                </div>
-
-
-                                <div class="table-responsive">
-
-                                    <table class="table table-hover align-middle mb-0" id="salesTable">
-
-                                        <thead>
-
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Müşteri</th>
-                                                <th>Ürün</th>
-                                                <th>Ödeme</th>
-                                                <th>Havale Alan</th>
-                                                <th>Tutar</th>
-                                                <th>Tarih</th>
-                                                <th></th>
-                                            </tr>
-
-                                        </thead>
-
-
-                                        <tbody id="salesBody"></tbody>
-
-                                    </table>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- ==================================================
-                         GİDER
-                         ================================================== -->
-
-                    <div class="tab-pane fade" id="expense" role="tabpanel">
-
-                        <div class="row g-4">
-
-                            <div class="col-lg-5">
-
-                                <div class="bg-light p-3 rounded-4">
-
-                                    <h6 class="section-title">
-
-                                        <i class="fas fa-wallet me-1 text-danger"></i>
-
-                                        Yeni Gider
-
-                                    </h6>
-
-
-                                    <form id="expenseForm">
-
-                                        <div class="row g-3">
-
-                                            <div class="col-md-12">
-
-                                                <label class="form-label">
-                                                    📂 Hazır Gider Kalemleri
-                                                </label>
-
-                                                <div class="d-flex flex-wrap gap-1 mb-2" id="expenseTagsContainer">
-                                                </div>
-
-                                            </div>
-
-
-                                            <div class="col-md-6">
-
-                                                <label class="form-label">
-                                                    📂 Kategori
-                                                </label>
-
-                                                <select class="form-select" id="expenseCategory">
-
-                                                    <option value="Yemek/İçecek">
-                                                        Yemek/İçecek
-                                                    </option>
-
-                                                    <option value="Kira">
-                                                        Kira
-                                                    </option>
-
-                                                    <option value="Fatura">
-                                                        Fatura
-                                                    </option>
-
-                                                    <option value="Ulaşım">
-                                                        Ulaşım
-                                                    </option>
-
-                                                    <option value="Ofis">
-                                                        Ofis
-                                                    </option>
-
-                                                    <option value="Diğer">
-                                                        Diğer
-                                                    </option>
-
-                                                </select>
-
-                                            </div>
-
-
-                                            <div class="col-md-6">
-
-                                                <label class="form-label">
-                                                    📦 Ürün / Hizmet
-                                                </label>
-
-                                                <input type="text" class="form-control" id="expenseProduct"
-                                                    placeholder="Ürün adı" />
-
-                                            </div>
-
-
-                                            <div class="col-md-6">
-
-                                                <label class="form-label">
-                                                    👤 Alıcı / Firma
-                                                </label>
-
-                                                <input type="text" class="form-control" id="expenseReceiver"
-                                                    placeholder="Alıcı adı" />
-
-                                            </div>
-
-
-                                            <div class="col-md-6">
-
-                                                <label class="form-label">
-                                                    📅 Tarih
-                                                </label>
-
-                                                <input type="date" class="form-control" id="expenseDate" />
-
-                                            </div>
-
-
-                                            <div class="col-12">
-
-                                                <label class="form-label">
-                                                    💰 Tutar (₺)
-                                                </label>
-
-                                                <div class="input-group">
-
-                                                    <span class="input-group-text bg-white border-end-0">
-                                                        ₺
-                                                    </span>
-
-                                                    <input type="number" class="form-control border-start-0" id="expenseAmount"
-                                                        placeholder="0.00" step="0.01" />
-
-                                                </div>
-
-                                            </div>
-
-
-                                            <div class="col-12">
-
-                                                <label class="form-label">
-                                                    📝 Açıklama / Not
-                                                </label>
-
-                                                <input type="text" class="form-control" id="expenseNote"
-                                                    placeholder="İsteğe bağlı" />
-
-                                            </div>
-
-
-                                            <div class="col-12 d-flex gap-2 mt-2">
-
-                                                <button type="button" class="btn btn-primary" id="addExpenseBtn">
-
-                                                    <i class="fas fa-plus me-1"></i>
-
-                                                    Ekle
-
-                                                </button>
-
-
-                                                <button type="button" class="btn btn-outline-secondary" id="clearExpenseBtn">
-
-                                                    <i class="fas fa-trash-alt"></i>
-
-                                                </button>
-
-                                            </div>
-
-                                        </div>
-
-                                    </form>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="col-lg-7">
-
-                                <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
-
-                                    <h6 class="mb-0 fw-semibold">
-
-                                        <i class="fas fa-table me-1 text-secondary"></i>
-
-                                        Gider Listesi
-
-                                    </h6>
-
-
-                                    <div class="search-box" style="flex:1; max-width:260px;">
-
-                                        <i class="fas fa-search"></i>
-
-                                        <input type="text" class="form-control" id="expenseSearch" placeholder="Ara..." />
-
-                                    </div>
-
-
-                                    <span class="row-count-badge" id="expenseRowCount">
-
-                                        0 satır
-
-                                    </span>
-
-                                </div>
-
-
-                                <div class="table-responsive">
-
-                                    <table class="table table-hover align-middle mb-0" id="expenseTable">
-
-                                        <thead>
-
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Kategori</th>
-                                                <th>Ürün/Hizmet</th>
-                                                <th>Alıcı</th>
-                                                <th>Tutar</th>
-                                                <th>Tarih</th>
-                                                <th>Not</th>
-                                                <th></th>
-                                            </tr>
-
-                                        </thead>
-
-
-                                        <tbody id="expenseBody"></tbody>
-
-                                    </table>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- ==================================================
-                         YÖNETİM
-                         ================================================== -->
-
-                    <div class="tab-pane fade" id="management" role="tabpanel">
-
-                        <div class="row g-4">
-
-                            <div class="col-md-6">
-
-                                <div class="card h-100">
-
-                                    <div class="card-body">
-
-                                        <h6 class="section-title">
-
-                                            <i class="fas fa-user-plus me-1 text-primary"></i>
-
-                                            Havale Alacak Kişiler
-
-                                        </h6>
-
-
-                                        <div class="d-flex gap-2 mb-3 flex-wrap">
-
-                                            <input type="text" class="form-control" id="newRecipientName" placeholder="Kişi adı"
-                                                style="flex:1; min-width:120px;" />
-
-                                            <input type="text" class="form-control" id="newRecipientNote"
-                                                placeholder="Banka / IBAN / Not" style="flex:2; min-width:150px;" />
-
-                                            <button class="btn btn-primary" id="addRecipientBtn">
-
-                                                <i class="fas fa-plus"></i>
-
-                                            </button>
-
-                                        </div>
-
-
-                                        <div id="recipientList" class="d-flex flex-wrap gap-2">
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="col-md-6">
-
-                                <div class="card h-100">
-
-                                    <div class="card-body">
-
-                                        <h6 class="section-title">
-
-                                            <i class="fas fa-tag me-1 text-danger"></i>
-
-                                            Hazır Gider Kalemleri
-
-                                        </h6>
-
-
-                                        <div class="d-flex gap-2 mb-3 flex-wrap">
-
-                                            <input type="text" class="form-control" id="newExpenseCategory"
-                                                placeholder="Kategori" style="flex:1; min-width:80px;" />
-
-                                            <input type="text" class="form-control" id="newExpenseProduct"
-                                                placeholder="Ürün adı" style="flex:1; min-width:80px;" />
-
-                                            <input type="number" class="form-control" id="newExpenseAmount"
-                                                placeholder="Tutar" style="width:90px;" />
-
-                                            <input type="text" class="form-control" id="newExpenseReceiver"
-                                                placeholder="Alıcı" style="flex:1; min-width:80px;" />
-
-                                            <input type="text" class="form-control" id="newExpenseNote" placeholder="Not"
-                                                style="flex:1; min-width:80px;" />
-
-                                            <button class="btn btn-primary" id="addExpenseTemplateBtn">
-
-                                                <i class="fas fa-plus"></i>
-
-                                            </button>
-
-                                        </div>
-
-
-                                        <div id="expenseTemplateList" class="d-flex flex-wrap gap-2">
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- ====================================================
-                     EXCEL
-                     ==================================================== -->
-
-                <div class="row mt-4">
-
-                    <div class="col-12 d-flex justify-content-center gap-3 flex-wrap">
-
-                        <button class="btn btn-success btn-lg" id="exportExcel">
-
-                            <i class="fas fa-file-excel me-2"></i>
-
-                            Excel İndir
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="card-footer bg-white border-0 text-center pt-0 pb-3">
-
-                <footer>
-
-                    <i class="fas fa-database me-1"></i>
-
-                    Tüm veriler Firebase'de saklanır.
-
-                </footer>
-
-            </div>
-
+        <div class="table-wrap">
+          <table id="salesTable">
+            <thead><tr><th>#</th><th>Müşteri</th><th>Ürün</th><th>Ödeme</th><th>Havale Alan</th><th class="r">Tutar</th><th>Tarih</th><th></th></tr></thead>
+            <tbody id="salesBody"></tbody>
+            <tfoot><tr><td colspan="5" id="salesFootL">Toplam</td><td class="r num" id="salesFootSum">0,00 ₺</td><td colspan="2"></td></tr></tfoot>
+          </table>
         </div>
-
+      </section>
     </div>
+  </div>
 
-
-    <!-- ================================================================
-         BAKİYE DÜZENLEME MODALI
-         ================================================================ -->
-
-    <div class="edit-balance-modal-overlay" id="editBalanceModal">
-
-        <div class="edit-balance-modal-box">
-
-            <h6 class="mb-2">
-
-                <i class="fas fa-pen me-2"></i>
-
-                Kasa Bakiyesini Düzenle
-
-            </h6>
-
-
-            <p class="info-text">
-
-                Kasadaki gerçek nakit miktarını girin.
-
-            </p>
-
-
-            <div class="fixed-balance-info">
-
-                <div class="label">
-
-                    📊 Normalde Olması Gereken Bakiye
-
-                </div>
-
-
-                <div class="amount" id="fixedBalanceDisplay">
-
-                    0,00 ₺
-
-                </div>
-
-            </div>
-
-
-            <div class="warning-text">
-
-                <i class="fas fa-exclamation-triangle me-1"></i>
-
-                Mevcut bakiye:
-
-                <span id="currentBalanceDisplay">
-                    0,00
-                </span>
-
-                ₺
-
-            </div>
-
-
-            <div class="mb-3 mt-3">
-
-                <label class="form-label">
-                    Yeni Bakiye (₺)
-                </label>
-
-                <input type="number" class="form-control" id="manualBalanceInput" step="0.01" placeholder="0.00" />
-
-            </div>
-
-
-            <div class="d-flex gap-2 flex-wrap">
-
-                <button class="btn btn-primary" id="saveManualBalance">
-
-                    <i class="fas fa-save me-1"></i>
-
-                    Kaydet
-
+  <!-- ============ GİDER ============ -->
+  <div class="tab-pane" id="expense">
+    <div class="pane-grid">
+      <section class="card form-out">
+        <div class="card-head"><span class="badge-dot" style="background:var(--out)"></span><h3>Yeni Gider</h3></div>
+        <div class="card-body">
+          <form id="expenseForm" autocomplete="off" onsubmit="return false">
+            <div class="fgrid">
+              <div class="field full">
+                <label>Hazır Gider Kalemleri</label>
+                <div class="quick" id="expenseTagsContainer"></div>
+              </div>
+              <div class="field">
+                <label for="expenseCategory">Kategori</label>
+                <div class="iw"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>
+                  <select id="expenseCategory">
+                    <option value="Yemek/İçecek">Yemek/İçecek</option>
+                    <option value="Kira">Kira</option>
+                    <option value="Fatura">Fatura</option>
+                    <option value="Ulaşım">Ulaşım</option>
+                    <option value="Ofis">Ofis</option>
+                    <option value="Diğer">Diğer</option>
+                  </select></div>
+              </div>
+              <div class="field">
+                <label for="expenseProduct">Ürün / Hizmet</label>
+                <div class="iw"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/></svg>
+                  <input type="text" id="expenseProduct" placeholder="Ürün adı" /></div>
+              </div>
+              <div class="field">
+                <label for="expenseReceiver">Alıcı / Firma</label>
+                <div class="iw"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>
+                  <input type="text" id="expenseReceiver" placeholder="Alıcı adı" list="receiverList" /></div>
+                <datalist id="receiverList"></datalist>
+              </div>
+              <div class="field">
+                <label for="expenseDate">Tarih</label>
+                <div class="iw"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                  <input type="date" id="expenseDate" /></div>
+              </div>
+              <div class="field full">
+                <label for="expenseAmount">Tutar</label>
+                <div class="iw"><span class="pre">₺</span><input type="text" inputmode="decimal" class="amount" id="expenseAmount" placeholder="0,00" /></div>
+              </div>
+              <div class="field full">
+                <label for="expenseNote">Açıklama / Not <span class="opt">(isteğe bağlı)</span></label>
+                <div class="iw"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>
+                  <input type="text" id="expenseNote" placeholder="İsteğe bağlı" /></div>
+              </div>
+              <div class="form-actions full">
+                <button type="button" class="btn btn-out" id="addExpenseBtn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                  Gider Ekle <kbd>Enter</kbd>
                 </button>
-
-
-                <button class="btn btn-outline-secondary" id="cancelManualBalance">
-
-                    İptal
-
-                </button>
-
+              </div>
             </div>
-
+          </form>
         </div>
+      </section>
 
+      <section class="card">
+        <div class="card-head">
+          <h3>Gider Listesi</h3>
+          <div class="list-tools">
+            <div class="iw"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+              <input type="search" id="expenseSearch" placeholder="Ara…" /></div>
+            <select id="expenseCatFilter" class="plain" style="width:auto;padding-left:12px;padding-top:8px;padding-bottom:8px;font-size:.85rem"><option value="">Tüm kategoriler</option></select>
+            <span class="row-count-badge" id="expenseRowCount">0 satır</span>
+            <button type="button" class="btn btn-ghost btn-sm danger" id="clearExpenseBtn" title="Tüm gider kayıtlarını sil">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="expenseTable">
+            <thead><tr><th>#</th><th>Kategori</th><th>Ürün/Hizmet</th><th>Alıcı</th><th class="r">Tutar</th><th>Tarih</th><th>Not</th><th></th></tr></thead>
+            <tbody id="expenseBody"></tbody>
+            <tfoot><tr><td colspan="4" id="expenseFootL">Toplam</td><td class="r num" id="expenseFootSum">0,00 ₺</td><td colspan="3"></td></tr></tfoot>
+          </table>
+        </div>
+      </section>
     </div>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-
-
-    <script>
-
-        // ============================================================
-        // FIREBASE
-        // ============================================================
-
-     const firebaseConfig = {
-  apiKey: "AIzaSyAb_2EMlUN-Kj0U24lDNhMVb91khnRa9fQ",
-  authDomain: "gelirgideryonetimi-4a479.firebaseapp.com",
-  databaseURL: "https://gelirgideryonetimi-4a479-default-rtdb.firebaseio.com",
-  projectId: "gelirgideryonetimi-4a479",
-  storageBucket: "gelirgideryonetimi-4a479.firebasestorage.app",
-  messagingSenderId: "627010832588",
-  appId: "1:627010832588:web:321b4e8634ea7bbca75a69"
-};
-
-
-        firebase.initializeApp(firebaseConfig);
-
-        const db = firebase.database();
-
-
-        const salesRef =
-            db.ref('gelirler');
-
-        const expenseRef =
-            db.ref('giderler');
-
-        const recipientsRef =
-            db.ref('havaleAlacakKisiler');
-
-        const expenseTemplatesRef =
-            db.ref('hazirGiderKalemleri');
-
-        const balanceRef =
-            db.ref('kasaBakiye');
-
-        const fixedBalanceRef =
-            db.ref('normalBakiye');
-
-
-        // ============================================================
-        // BAKİYE - SADECE MANUEL
-        // ============================================================
-
-        let currentBalance = 0;
-        let fixedBalance = 0;
-        let isManualMode = false;
-        let manualBaseBalance = 0;
-
-
-        const balanceBadge =
-            document.getElementById('balanceBadge');
-
-        const currentBalanceDisplay =
-            document.getElementById('currentBalanceDisplay');
-
-        const fixedBalanceDisplay =
-            document.getElementById('fixedBalanceDisplay');
-
-
-        function formatAmount(val) {
-
-            if (isNaN(val) || val === '') {
-                return '0,00';
-            }
-
-            return parseFloat(val).toLocaleString(
-                'tr-TR',
-                {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }
-            );
-        }
-
-
-        function updateBalanceDisplay(balance) {
-
-            balanceBadge.textContent =
-                formatAmount(balance) + ' ₺';
-
-            currentBalanceDisplay.textContent =
-                formatAmount(balance);
-        }
-
-
-        function updateFixedBalanceDisplay(balance) {
-
-            fixedBalanceDisplay.textContent =
-                formatAmount(balance) + ' ₺';
-        }
-
-
-        // ============================================================
-        // BAKİYE HESAPLAMA
-        // ============================================================
-
-        function calculateBalance() {
-
-            let totalNakitGelir = 0;
-
-            salesData.forEach(item => {
-
-                if (item.odeme === 'Nakit') {
-
-                    totalNakitGelir +=
-                        parseFloat(item.tutar) || 0;
-                }
-            });
-
-
-            let totalGider = 0;
-
-            expenseData.forEach(item => {
-
-                totalGider +=
-                    parseFloat(item.tutar) || 0;
-            });
-
-
-            if (isManualMode) {
-
-                return manualBaseBalance +
-                    totalNakitGelir -
-                    totalGider;
-
-            } else {
-
-                return totalNakitGelir -
-                    totalGider;
-            }
-        }
-
-
-        function refreshBalance() {
-
-            const newBalance =
-                calculateBalance();
-
-            currentBalance = newBalance;
-
-            updateBalanceDisplay(
-                currentBalance
-            );
-
-
-            // Firebase'e sadece balance'ı güncelle
-            balanceRef.update({
-
-                balance: currentBalance,
-
-                updatedAt:
-                    firebase.database
-                        .ServerValue
-                        .TIMESTAMP
-            });
-
-
-            // Sabit bakiyeyi güncelle
-            fixedBalance =
-                totalNakitGelir - totalGider;
-
-            updateFixedBalanceDisplay(
-                fixedBalance
-            );
-
-
-            fixedBalanceRef.set({
-
-                balance: fixedBalance,
-
-                updatedAt:
-                    firebase.database
-                        .ServerValue
-                        .TIMESTAMP
-            });
-        }
-
-
-        // ============================================================
-        // IBAN MODAL
-        // ============================================================
-
-        const ibanModal =
-            document.getElementById('ibanModal');
-
-        const ibanModalName =
-            document.getElementById('ibanModalName');
-
-        const ibanModalContent =
-            document.getElementById('ibanModalContent');
-
-        const ibanModalClose =
-            document.getElementById('ibanModalClose');
-
-
-        function showIbanModal(name, content) {
-
-            ibanModalName.textContent = name;
-
-            ibanModalContent.textContent =
-                content || '(Not girilmemiş)';
-
-            ibanModal.classList.add('active');
-
-            document.body.style.overflow = 'hidden';
-        }
-
-
-        function closeIbanModal() {
-
-            ibanModal.classList.remove('active');
-
-            document.body.style.overflow = '';
-        }
-
-
-        ibanModalClose.addEventListener(
-            'click',
-            closeIbanModal
-        );
-
-
-        ibanModal.addEventListener(
-            'click',
-            function(e) {
-
-                if (e.target === this) {
-
-                    closeIbanModal();
-                }
-            }
-        );
-
-
-        document.addEventListener(
-            'keydown',
-            function(e) {
-
-                if (e.key === 'Escape') {
-
-                    closeIbanModal();
-                }
-            }
-        );
-
-
-        // ============================================================
-        // DÜZENLEME MENÜSÜ
-        // ============================================================
-
-        function openEditModal() {
-
-            const manualInput =
-                document.getElementById(
-                    'manualBalanceInput'
-                );
-
-            manualInput.value = '';
-
-            currentBalanceDisplay.textContent =
-                formatAmount(currentBalance);
-
-            updateFixedBalanceDisplay(
-                fixedBalance
-            );
-
-            editBalanceModal
-                .classList
-                .add('active');
-
-            setTimeout(() => {
-                manualInput.focus();
-            }, 100);
-        }
-
-
-        // ============================================================
-        // BAKİYE KAYDETME (MANUEL)
-        // ============================================================
-
-        const editBalanceModal =
-            document.getElementById(
-                'editBalanceModal'
-            );
-
-        const manualBalanceInput =
-            document.getElementById(
-                'manualBalanceInput'
-            );
-
-
-        document
-            .getElementById('saveManualBalance')
-            .addEventListener(
-                'click',
-                function() {
-
-                    const val =
-                        parseFloat(
-                            manualBalanceInput.value
-                        );
-
-
-                    if (
-                        isNaN(val) ||
-                        val < 0
-                    ) {
-
-                        alert(
-                            'Geçerli bir sayı giriniz (0 veya pozitif).'
-                        );
-
-                        return;
-                    }
-
-
-                    // Manuel moda geç
-                    isManualMode = true;
-
-                    manualBaseBalance = val;
-
-
-                    // Bakiyeyi güncelle
-                    refreshBalance();
-
-
-                    // Firebase'e manuel mod bilgilerini kaydet
-                    balanceRef.set({
-
-                        balance: currentBalance,
-
-                        isManual: true,
-
-                        manualBase: val,
-
-                        updatedAt:
-                            firebase.database
-                                .ServerValue
-                                .TIMESTAMP
-                    });
-
-
-                    editBalanceModal
-                        .classList
-                        .remove('active');
-
-
-                    setSyncStatus(
-                        '✅ Bakiye ' +
-                        formatAmount(val) +
-                        ' ₺ olarak ayarlandı (Manuel)',
-                        'success'
-                    );
-                }
-            );
-
-
-        document
-            .getElementById('cancelManualBalance')
-            .addEventListener(
-                'click',
-                function() {
-
-                    editBalanceModal
-                        .classList
-                        .remove('active');
-                }
-            );
-
-
-        editBalanceModal
-            .addEventListener(
-                'click',
-                function(e) {
-
-                    if (e.target === this) {
-
-                        this.classList
-                            .remove('active');
-                    }
-                }
-            );
-
-
-        // ============================================================
-        // GELİR
-        // ============================================================
-
-        const salesBody =
-            document.getElementById('salesBody');
-
-        const salesSearch =
-            document.getElementById('salesSearch');
-
-        const salesRowCount =
-            document.getElementById('salesRowCount');
-
-        let salesData = [];
-
-        let totalNakitGelir = 0;
-        let totalGider = 0;
-
-
-        function renderSales() {
-
-            salesBody.innerHTML = '';
-
-
-            if (salesData.length === 0) {
-
-                salesBody.innerHTML =
-                    '<tr><td colspan="8" class="text-center text-muted">Henüz gelir kaydı yok</td></tr>';
-
-                salesRowCount.textContent =
-                    '0 satır';
-
-                return;
-            }
-
-
-            salesData.forEach((item, index) => {
-
-                const tr =
-                    document.createElement('tr');
-
-
-                const payBadge =
-                    item.odeme === 'Havale'
-                        ? 'havale'
-                        : 'nakit';
-
-
-                const havaleText =
-                    item.odeme === 'Havale'
-                        ? (item.havaleAlan || '—')
-                        : '—';
-
-
-                tr.innerHTML = `
-                    <td>${index + 1}</td>
-
-                    <td>
-                        ${escapeHtml(
-                            item.musteri ||
-                            '(isimsiz)'
-                        )}
-                    </td>
-
-                    <td>
-                        <span class="product-badge">
-                            ${escapeHtml(
-                                item.urun ||
-                                '(ürün yok)'
-                            )}
-                        </span>
-                    </td>
-
-                    <td>
-                        <span class="type-badge ${payBadge}">
-                            ${item.odeme}
-                        </span>
-                    </td>
-
-                    <td>
-                        ${escapeHtml(havaleText)}
-                    </td>
-
-                    <td>
-                        ${formatAmount(item.tutar)}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            item.tarih || ''
-                        )}
-                    </td>
-
-                    <td>
-                        <button
-                            class="btn btn-sm btn-outline-danger remove-sales-btn"
-                            data-id="${item.id}">
-
-                            <i class="fas fa-times"></i>
-
-                        </button>
-                    </td>
-                `;
-
-
-                salesBody.appendChild(tr);
-            });
-
-
-            salesBody
-                .querySelectorAll(
-                    '.remove-sales-btn'
-                )
-                .forEach(btn => {
-
-                    btn.addEventListener(
-                        'click',
-                        function() {
-
-                            const id =
-                                this.dataset.id;
-
-
-                            if (
-                                confirm(
-                                    'Bu gelir kaydını silmek istediğinize emin misiniz?'
-                                )
-                            ) {
-
-                                salesRef
-                                    .child(id)
-                                    .remove()
-                                    .then(() => {
-
-                                        // Silme işleminden sonra bakiyeyi güncelle
-                                        setTimeout(
-                                            () => {
-                                                refreshBalance();
-                                            },
-                                            300
-                                        );
-                                    });
-                            }
-                        }
-                    );
-                });
-
-
-            salesRowCount.textContent =
-                salesData.length + ' satır';
-
-
-            // Toplam nakit geliri hesapla
-            totalNakitGelir = 0;
-
-            salesData.forEach(item => {
-
-                if (item.odeme === 'Nakit') {
-
-                    totalNakitGelir +=
-                        parseFloat(item.tutar) || 0;
-                }
-            });
-        }
-
-
-        salesRef.on('value', (snapshot) => {
-
-            const data =
-                snapshot.val();
-
-            salesData = [];
-
-
-            if (data) {
-
-                Object.keys(data).forEach(key => {
-
-                    salesData.push({
-                        id: key,
-                        ...data[key]
-                    });
-
-                });
-
-
-                salesData.sort(
-                    (a, b) =>
-                        (b.tarih || '')
-                            .localeCompare(
-                                a.tarih || ''
-                            )
-                );
-            }
-
-
-            renderSales();
-
-            // Bakiyeyi güncelle
-            refreshBalance();
-
-            setSyncStatus(
-                '✅ ' +
-                salesData.length +
-                ' gelir',
-                'success'
-            );
-        });
-
-
-        document
-            .getElementById('addSalesBtn')
-            .addEventListener(
-                'click',
-                function() {
-
-                    const musteri =
-                        document
-                            .getElementById(
-                                'salesCustomer'
-                            )
-                            .value
-                            .trim() ||
-                        '(isimsiz)';
-
-
-                    const urun =
-                        document
-                            .getElementById(
-                                'salesProduct'
-                            )
-                            .value
-                            .trim() ||
-                        '(ürün yok)';
-
-
-                    const odeme =
-                        document
-                            .getElementById(
-                                'salesPayment'
-                            )
-                            .value;
-
-
-                    const tarih =
-                        document
-                            .getElementById(
-                                'salesDate'
-                            )
-                            .value ||
-                        getToday();
-
-
-                    let havaleAlan =
-                        odeme === 'Havale'
-                            ? (
-                                document
-                                    .getElementById(
-                                        'salesHavaleNote'
-                                    )
-                                    .value
-                                    .trim() ||
-                                '(havale bilgisi yok)'
-                            )
-                            : '—';
-
-
-                    const tutar =
-                        parseFloat(
-                            document
-                                .getElementById(
-                                    'salesAmount'
-                                )
-                                .value
-                        );
-
-
-                    if (
-                        !tutar ||
-                        tutar <= 0
-                    ) {
-
-                        alert(
-                            'Geçerli bir tutar giriniz.'
-                        );
-
-                        return;
-                    }
-
-
-                    salesRef.push({
-
-                        musteri,
-                        urun,
-                        odeme,
-                        tarih,
-                        havaleAlan,
-                        tutar,
-
-                        createdAt:
-                            firebase.database
-                                .ServerValue
-                                .TIMESTAMP
-
-                    }).then(() => {
-
-                        setSyncStatus(
-                            '✅ Gelir eklendi',
-                            'success'
-                        );
-
-
-                        document
-                            .getElementById(
-                                'salesCustomer'
-                            )
-                            .value = '';
-
-
-                        document
-                            .getElementById(
-                                'salesProduct'
-                            )
-                            .value = '';
-
-
-                        document
-                            .getElementById(
-                                'salesAmount'
-                            )
-                            .value = '';
-
-
-                        if (
-                            odeme === 'Havale'
-                        ) {
-
-                            document
-                                .getElementById(
-                                    'salesHavaleNote'
-                                )
-                                .value = '';
-                        }
-
-
-                        document
-                            .getElementById(
-                                'salesDate'
-                            )
-                            .value =
-                            getToday();
-                    });
-                }
-            );
-
-
-        document
-            .getElementById('clearSalesBtn')
-            .addEventListener(
-                'click',
-                function() {
-
-                    if (
-                        salesData.length === 0
-                    )
-                        return;
-
-
-                    if (
-                        confirm(
-                            'TÜM gelir kayıtları silinsin mi?'
-                        )
-                    ) {
-
-                        salesRef.remove()
-                            .then(() => {
-
-                                setTimeout(
-                                    () => {
-                                        refreshBalance();
-                                    },
-                                    300
-                                );
-                            });
-                    }
-                }
-            );
-
-
-        salesSearch.addEventListener(
-            'input',
-            function() {
-
-                filterTable(
-                    salesBody,
-                    salesSearch
-                );
-
-
-                const visible =
-                    salesBody.querySelectorAll(
-                        'tr:not([style*="display: none"])'
-                    ).length;
-
-
-                salesRowCount.textContent =
-                    visible + ' satır';
-            }
-        );
-
-
-        // ============================================================
-        // GİDER
-        // ============================================================
-
-        const expenseBody =
-            document.getElementById(
-                'expenseBody'
-            );
-
-        const expenseSearch =
-            document.getElementById(
-                'expenseSearch'
-            );
-
-        const expenseRowCount =
-            document.getElementById(
-                'expenseRowCount'
-            );
-
-        let expenseData = [];
-
-
-        function renderExpenses() {
-
-            expenseBody.innerHTML = '';
-
-
-            if (
-                expenseData.length === 0
-            ) {
-
-                expenseBody.innerHTML =
-                    '<tr><td colspan="8" class="text-center text-muted">Henüz gider kaydı yok</td></tr>';
-
-                expenseRowCount.textContent =
-                    '0 satır';
-
-                return;
-            }
-
-
-            expenseData.forEach(
-                (item, index) => {
-
-                    const tr =
-                        document.createElement(
-                            'tr'
-                        );
-
-
-                    tr.innerHTML = `
-
-                        <td>${index + 1}</td>
-
-                        <td>
-                            ${escapeHtml(
-                                item.kategori ||
-                                '(kategori yok)'
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHtml(
-                                item.urun ||
-                                '(ürün yok)'
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHtml(
-                                item.alici ||
-                                '(alıcı yok)'
-                            )}
-                        </td>
-
-                        <td>
-                            ${formatAmount(
-                                item.tutar
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHtml(
-                                item.tarih || ''
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHtml(
-                                item.not || '—'
-                            )}
-                        </td>
-
-                        <td>
-
-                            <button
-                                class="btn btn-sm btn-outline-danger remove-expense-btn"
-                                data-id="${item.id}">
-
-                                <i class="fas fa-times"></i>
-
-                            </button>
-
-                        </td>
-
-                    `;
-
-
-                    expenseBody.appendChild(tr);
-                }
-            );
-
-
-            expenseBody
-                .querySelectorAll(
-                    '.remove-expense-btn'
-                )
-                .forEach(btn => {
-
-                    btn.addEventListener(
-                        'click',
-                        function() {
-
-                            const id =
-                                this.dataset.id;
-
-
-                            if (
-                                confirm(
-                                    'Bu gider kaydını silmek istediğinize emin misiniz?'
-                                )
-                            ) {
-
-                                expenseRef
-                                    .child(id)
-                                    .remove()
-                                    .then(() => {
-
-                                        setTimeout(
-                                            () => {
-                                                refreshBalance();
-                                            },
-                                            300
-                                        );
-                                    });
-                            }
-                        }
-                    );
-                });
-
-
-            expenseRowCount.textContent =
-                expenseData.length +
-                ' satır';
-
-
-            // Toplam gideri hesapla
-            totalGider = 0;
-
-            expenseData.forEach(item => {
-
-                totalGider +=
-                    parseFloat(item.tutar) || 0;
-            });
-        }
-
-
-        expenseRef.on('value', (snapshot) => {
-
-            const data =
-                snapshot.val();
-
-            expenseData = [];
-
-
-            if (data) {
-
-                Object.keys(data).forEach(key => {
-
-                    expenseData.push({
-                        id: key,
-                        ...data[key]
-                    });
-
-                });
-
-
-                expenseData.sort(
-                    (a, b) =>
-                        (b.tarih || '')
-                            .localeCompare(
-                                a.tarih || ''
-                            )
-                );
-            }
-
-
-            renderExpenses();
-
-            // Bakiyeyi güncelle
-            refreshBalance();
-        });
-
-
-        document
-            .getElementById('addExpenseBtn')
-            .addEventListener(
-                'click',
-                function() {
-
-                    const kategori =
-                        document
-                            .getElementById(
-                                'expenseCategory'
-                            )
-                            .value;
-
-
-                    const urun =
-                        document
-                            .getElementById(
-                                'expenseProduct'
-                            )
-                            .value
-                            .trim() ||
-                        '(ürün yok)';
-
-
-                    const alici =
-                        document
-                            .getElementById(
-                                'expenseReceiver'
-                            )
-                            .value
-                            .trim() ||
-                        '(alıcı yok)';
-
-
-                    const tarih =
-                        document
-                            .getElementById(
-                                'expenseDate'
-                            )
-                            .value ||
-                        getToday();
-
-
-                    const not =
-                        document
-                            .getElementById(
-                                'expenseNote'
-                            )
-                            .value
-                            .trim() ||
-                        '—';
-
-
-                    const tutar =
-                        parseFloat(
-                            document
-                                .getElementById(
-                                    'expenseAmount'
-                                )
-                                .value
-                        );
-
-
-                    if (
-                        !tutar ||
-                        tutar <= 0
-                    ) {
-
-                        alert(
-                            'Geçerli bir tutar giriniz.'
-                        );
-
-                        return;
-                    }
-
-
-                    expenseRef.push({
-
-                        kategori,
-                        urun,
-                        alici,
-                        tarih,
-                        not,
-                        tutar,
-
-                        createdAt:
-                            firebase.database
-                                .ServerValue
-                                .TIMESTAMP
-
-                    }).then(() => {
-
-                        setSyncStatus(
-                            '✅ Gider eklendi',
-                            'success'
-                        );
-
-
-                        document
-                            .getElementById(
-                                'expenseProduct'
-                            )
-                            .value = '';
-
-
-                        document
-                            .getElementById(
-                                'expenseReceiver'
-                            )
-                            .value = '';
-
-
-                        document
-                            .getElementById(
-                                'expenseAmount'
-                            )
-                            .value = '';
-
-
-                        document
-                            .getElementById(
-                                'expenseNote'
-                            )
-                            .value = '';
-
-
-                        document
-                            .getElementById(
-                                'expenseDate'
-                            )
-                            .value =
-                            getToday();
-                    });
-                }
-            );
-
-
-        document
-            .getElementById('clearExpenseBtn')
-            .addEventListener(
-                'click',
-                function() {
-
-                    if (
-                        expenseData.length === 0
-                    )
-                        return;
-
-
-                    if (
-                        confirm(
-                            'TÜM gider kayıtları silinsin mi?'
-                        )
-                    ) {
-
-                        expenseRef.remove()
-                            .then(() => {
-
-                                setTimeout(
-                                    () => {
-                                        refreshBalance();
-                                    },
-                                    300
-                                );
-                            });
-                    }
-                }
-            );
-
-
-        expenseSearch.addEventListener(
-            'input',
-            function() {
-
-                filterTable(
-                    expenseBody,
-                    expenseSearch
-                );
-
-
-                const visible =
-                    expenseBody.querySelectorAll(
-                        'tr:not([style*="display: none"])'
-                    ).length;
-
-
-                expenseRowCount.textContent =
-                    visible + ' satır';
-            }
-        );
-
-
-        // ============================================================
-        // HAVALE ALICILARI
-        // ============================================================
-
-        let recipients = [];
-
-
-        function renderRecipients() {
-
-            const container =
-                document.getElementById(
-                    'recipientList'
-                );
-
-            const tagsContainer =
-                document.getElementById(
-                    'recipientTagsContainer'
-                );
-
-
-            container.innerHTML = '';
-
-            tagsContainer.innerHTML = '';
-
-
-            if (
-                recipients.length === 0
-            ) {
-
-                container.innerHTML =
-                    '<span class="text-muted small">Henüz kişi eklenmemiş.</span>';
-
-                tagsContainer.innerHTML =
-                    '<span class="text-muted small">Listeden kişi ekleyin.</span>';
-
-                return;
-            }
-
-
-            recipients.forEach((r) => {
-
-                const hasNote =
-                    r.note &&
-                    r.note.trim().length > 0;
-
-
-                const div =
-                    document.createElement(
-                        'div'
-                    );
-
-
-                div.className =
-                    'management-tag';
-
-
-                div.innerHTML = `
-
-                    <strong>
-                        ${escapeHtml(r.name)}
-                    </strong>
-
-                    ${
-                        hasNote
-                            ? `<span class="bank-info" data-name="${escapeHtml(r.name)}" data-note="${escapeHtml(r.note)}">
-                                ${escapeHtml(r.note)}
-                               </span>`
-                            : ''
-                    }
-
-                    <span
-                        class="remove-tag"
-                        data-id="${r.id}">
-
-                        ✕
-
-                    </span>
-                `;
-
-
-                container.appendChild(div);
-
-                // IBAN'a tıklanınca modal aç
-                if (hasNote) {
-
-                    const bankInfo =
-                        div.querySelector(
-                            '.bank-info'
-                        );
-
-                    bankInfo.addEventListener(
-                        'click',
-                        function(e) {
-
-                            e.stopPropagation();
-
-                            const name =
-                                this.dataset.name;
-
-                            const note =
-                                this.dataset.note;
-
-                            showIbanModal(
-                                name,
-                                note
-                            );
-                        }
-                    );
-                }
-
-
-                const tag =
-                    document.createElement(
-                        'span'
-                    );
-
-
-                tag.className =
-                    'recipient-tag';
-
-
-                tag.textContent =
-                    r.name;
-
-
-                tag.addEventListener(
-                    'click',
-                    function() {
-
-                        document
-                            .getElementById(
-                                'salesHavaleNote'
-                            )
-                            .value =
-                            r.name;
-
-
-                        document
-                            .getElementById(
-                                'salesPayment'
-                            )
-                            .value =
-                            'Havale';
-
-
-                        toggleSalesHavale();
-                    }
-                );
-
-
-                tagsContainer.appendChild(tag);
-            });
-
-
-            container
-                .querySelectorAll(
-                    '.remove-tag'
-                )
-                .forEach(el => {
-
-                    el.addEventListener(
-                        'click',
-                        function() {
-
-                            const id =
-                                this.dataset.id;
-
-
-                            if (
-                                confirm(
-                                    'Bu kişiyi silmek istediğinize emin misiniz?'
-                                )
-                            ) {
-
-                                recipientsRef
-                                    .child(id)
-                                    .remove();
-                            }
-                        }
-                    );
-                });
-        }
-
-
-        recipientsRef.on(
-            'value',
-            (snapshot) => {
-
-                const data =
-                    snapshot.val();
-
-
-                recipients = [];
-
-
-                if (data) {
-
-                    Object.keys(data)
-                        .forEach(key => {
-
-                            recipients.push({
-                                id: key,
-                                ...data[key]
-                            });
-                        });
-                }
-
-
-                renderRecipients();
-            }
-        );
-
-
-        document
-            .getElementById(
-                'addRecipientBtn'
-            )
-            .addEventListener(
-                'click',
-                function() {
-
-                    const name =
-                        document
-                            .getElementById(
-                                'newRecipientName'
-                            )
-                            .value
-                            .trim();
-
-
-                    const note =
-                        document
-                            .getElementById(
-                                'newRecipientNote'
-                            )
-                            .value
-                            .trim();
-
-
-                    if (!name) {
-
-                        alert(
-                            'Kişi adı giriniz.'
-                        );
-
-                        return;
-                    }
-
-
-                    recipientsRef
-                        .push({
-                            name,
-                            note
-                        })
-                        .then(() => {
-
-                            setSyncStatus(
-                                '✅ Kişi eklendi',
-                                'success'
-                            );
-
-
-                            document
-                                .getElementById(
-                                    'newRecipientName'
-                                )
-                                .value = '';
-
-
-                            document
-                                .getElementById(
-                                    'newRecipientNote'
-                                )
-                                .value = '';
-                        });
-                }
-            );
-
-
-        // ============================================================
-        // HAZIR GİDER KALEMLERİ
-        // ============================================================
-
-        let expenseTemplates = [];
-
-
-        function renderExpenseTemplates() {
-
-            const container =
-                document.getElementById(
-                    'expenseTemplateList'
-                );
-
-
-            const tagsContainer =
-                document.getElementById(
-                    'expenseTagsContainer'
-                );
-
-
-            container.innerHTML = '';
-
-            tagsContainer.innerHTML = '';
-
-
-            if (
-                expenseTemplates.length === 0
-            ) {
-
-                container.innerHTML =
-                    '<span class="text-muted small">Henüz gider kalemi eklenmemiş.</span>';
-
-                tagsContainer.innerHTML =
-                    '<span class="text-muted small">Listeden gider kalemi ekleyin.</span>';
-
-                return;
-            }
-
-
-            expenseTemplates.forEach((e) => {
-
-                const div =
-                    document.createElement(
-                        'div'
-                    );
-
-
-                div.className =
-                    'management-tag';
-
-
-                div.innerHTML = `
-
-                    <strong>
-                        ${escapeHtml(e.kategori)}
-                    </strong>
-
-                    ${escapeHtml(e.urun)}
-                    (${formatAmount(e.tutar)}₺)
-
-                    ${
-                        e.alici
-                            ? `- ${escapeHtml(e.alici)}`
-                            : ''
-                    }
-
-                    ${
-                        e.not
-                            ? `<span class="bank-info">
-                                ${escapeHtml(e.not)}
-                               </span>`
-                            : ''
-                    }
-
-                    <span
-                        class="remove-tag"
-                        data-id="${e.id}">
-
-                        ✕
-
-                    </span>
-                `;
-
-
-                container.appendChild(div);
-
-
-                const tag =
-                    document.createElement(
-                        'span'
-                    );
-
-
-                tag.className =
-                    'expense-quick-tag';
-
-
-                tag.textContent =
-                    `${e.urun} (${formatAmount(e.tutar)}₺)`;
-
-
-                tag.addEventListener(
-                    'click',
-                    function() {
-
-                        document
-                            .getElementById(
-                                'expenseCategory'
-                            )
-                            .value =
-                            e.kategori;
-
-
-                        document
-                            .getElementById(
-                                'expenseProduct'
-                            )
-                            .value =
-                            e.urun;
-
-
-                        document
-                            .getElementById(
-                                'expenseAmount'
-                            )
-                            .value =
-                            e.tutar;
-
-
-                        document
-                            .getElementById(
-                                'expenseReceiver'
-                            )
-                            .value =
-                            e.alici || '';
-
-
-                        document
-                            .getElementById(
-                                'expenseNote'
-                            )
-                            .value =
-                            e.not || '';
-                    }
-                );
-
-
-                tagsContainer.appendChild(tag);
-            });
-
-
-            container
-                .querySelectorAll(
-                    '.remove-tag'
-                )
-                .forEach(el => {
-
-                    el.addEventListener(
-                        'click',
-                        function() {
-
-                            const id =
-                                this.dataset.id;
-
-
-                            if (
-                                confirm(
-                                    'Bu gider kalemini silmek istediğinize emin misiniz?'
-                                )
-                            ) {
-
-                                expenseTemplatesRef
-                                    .child(id)
-                                    .remove();
-                            }
-                        }
-                    );
-                });
-        }
-
-
-        expenseTemplatesRef.on(
-            'value',
-            (snapshot) => {
-
-                const data =
-                    snapshot.val();
-
-
-                expenseTemplates = [];
-
-
-                if (data) {
-
-                    Object.keys(data)
-                        .forEach(key => {
-
-                            expenseTemplates.push({
-                                id: key,
-                                ...data[key]
-                            });
-                        });
-                }
-
-
-                renderExpenseTemplates();
-            }
-        );
-
-
-        document
-            .getElementById(
-                'addExpenseTemplateBtn'
-            )
-            .addEventListener(
-                'click',
-                function() {
-
-                    const kategori =
-                        document
-                            .getElementById(
-                                'newExpenseCategory'
-                            )
-                            .value
-                            .trim();
-
-
-                    const urun =
-                        document
-                            .getElementById(
-                                'newExpenseProduct'
-                            )
-                            .value
-                            .trim();
-
-
-                    const tutar =
-                        parseFloat(
-                            document
-                                .getElementById(
-                                    'newExpenseAmount'
-                                )
-                                .value
-                        );
-
-
-                    const alici =
-                        document
-                            .getElementById(
-                                'newExpenseReceiver'
-                            )
-                            .value
-                            .trim();
-
-
-                    const not =
-                        document
-                            .getElementById(
-                                'newExpenseNote'
-                            )
-                            .value
-                            .trim();
-
-
-                    if (
-                        !kategori ||
-                        !urun ||
-                        !tutar ||
-                        tutar <= 0
-                    ) {
-
-                        alert(
-                            'Kategori, ürün adı ve geçerli bir tutar giriniz.'
-                        );
-
-                        return;
-                    }
-
-
-                    expenseTemplatesRef
-                        .push({
-                            kategori,
-                            urun,
-                            tutar,
-                            alici,
-                            not
-                        })
-                        .then(() => {
-
-                            setSyncStatus(
-                                '✅ Gider kalemi eklendi',
-                                'success'
-                            );
-
-
-                            document
-                                .getElementById(
-                                    'newExpenseCategory'
-                                )
-                                .value = '';
-
-
-                            document
-                                .getElementById(
-                                    'newExpenseProduct'
-                                )
-                                .value = '';
-
-
-                            document
-                                .getElementById(
-                                    'newExpenseAmount'
-                                )
-                                .value = '';
-
-
-                            document
-                                .getElementById(
-                                    'newExpenseReceiver'
-                                )
-                                .value = '';
-
-
-                            document
-                                .getElementById(
-                                    'newExpenseNote'
-                                )
-                                .value = '';
-                        });
-                }
-            );
-
-
-        // ============================================================
-        // YARDIMCILAR
-        // ============================================================
-
-        function escapeHtml(unsafe) {
-
-            if (!unsafe)
-                return '';
-
-
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-
-        function getToday() {
-
-            return new Date()
-                .toISOString()
-                .split('T')[0];
-        }
-
-
-        function filterTable(
-            tbody,
-            searchInput
-        ) {
-
-            const query =
-                searchInput.value
-                    .toLowerCase()
-                    .trim();
-
-
-            const rows =
-                tbody.querySelectorAll('tr');
-
-
-            rows.forEach(row => {
-
-                const cells =
-                    row.querySelectorAll('td');
-
-
-                let match = false;
-
-
-                for (
-                    let i = 1;
-                    i < cells.length - 1;
-                    i++
-                ) {
-
-                    const text =
-                        cells[i]
-                            ?.textContent
-                            ?.toLowerCase() ||
-                        '';
-
-
-                    if (
-                        text.includes(query)
-                    ) {
-
-                        match = true;
-
-                        break;
-                    }
-                }
-
-
-                row.style.display =
-                    match ||
-                    query === ''
-                        ? ''
-                        : 'none';
-            });
-        }
-
-
-        function setSyncStatus(
-            text,
-            type = 'success'
-        ) {
-
-            const el =
-                document.getElementById(
-                    'syncStatus'
-                );
-
-
-            el.innerHTML = text;
-
-
-            el.className =
-                'badge bg-light text-secondary';
-
-
-            if (
-                type === 'syncing'
-            ) {
-
-                el.classList.add(
-                    'syncing'
-                );
-
-            } else if (
-                type === 'error'
-            ) {
-
-                el.classList.add(
-                    'error'
-                );
-
-            } else {
-
-                el.classList.add(
-                    'sync-status'
-                );
-            }
-        }
-
-
-        // ============================================================
-        // HAVALE TOGGLE
-        // ============================================================
-
-        const salesPayment =
-            document.getElementById(
-                'salesPayment'
-            );
-
-
-        const salesHavaleNote =
-            document.getElementById(
-                'salesHavaleNote'
-            );
-
-
-        function toggleSalesHavale() {
-
-            if (
-                salesPayment.value ===
-                'Havale'
-            ) {
-
-                salesHavaleNote.disabled =
-                    false;
-
-                salesHavaleNote.placeholder =
-                    'Havale alacak kişi bilgisi';
-
-            } else {
-
-                salesHavaleNote.disabled =
-                    true;
-
-                salesHavaleNote.value =
-                    '';
-
-                salesHavaleNote.placeholder =
-                    'Havale seçili değil';
-            }
-        }
-
-
-        salesPayment.addEventListener(
-            'change',
-            toggleSalesHavale
-        );
-
-
-        toggleSalesHavale();
-
-
-        // ============================================================
-        // EXCEL
-        // ============================================================
-
-        document
-            .getElementById(
-                'exportExcel'
-            )
-            .addEventListener(
-                'click',
-                function() {
-
-                    const salesRows =
-                        salesBody.querySelectorAll(
-                            'tr'
-                        );
-
-
-                    const expenseRows =
-                        expenseBody.querySelectorAll(
-                            'tr'
-                        );
-
-
-                    const wb =
-                        XLSX.utils.book_new();
-
-
-                    const salesDataExcel = [
-
-                        [
-                            '#',
-                            'Müşteri',
-                            'Ürün',
-                            'Ödeme Türü',
-                            'Havale Alan',
-                            'Tutar (₺)',
-                            'Tarih'
-                        ]
-                    ];
-
-
-                    salesRows.forEach(row => {
-
-                        const cols =
-                            row.querySelectorAll(
-                                'td'
-                            );
-
-
-                        if (
-                            cols.length >= 8
-                        ) {
-
-                            salesDataExcel.push([
-
-                                cols[0].textContent.trim(),
-                                cols[1].textContent.trim(),
-                                cols[2].textContent.trim(),
-                                cols[3].textContent.trim(),
-                                cols[4].textContent.trim(),
-                                cols[5].textContent.trim(),
-                                cols[6].textContent.trim()
-
-                            ]);
-                        }
-                    });
-
-
-                    const wsSales =
-                        XLSX.utils.aoa_to_sheet(
-                            salesDataExcel
-                        );
-
-
-                    XLSX.utils.book_append_sheet(
-                        wb,
-                        wsSales,
-                        'Gelir'
-                    );
-
-
-                    const expenseDataExcel = [
-
-                        [
-                            '#',
-                            'Kategori',
-                            'Ürün/Hizmet',
-                            'Alıcı',
-                            'Tutar (₺)',
-                            'Tarih',
-                            'Not'
-                        ]
-                    ];
-
-
-                    expenseRows.forEach(row => {
-
-                        const cols =
-                            row.querySelectorAll(
-                                'td'
-                            );
-
-
-                        if (
-                            cols.length >= 8
-                        ) {
-
-                            expenseDataExcel.push([
-
-                                cols[0].textContent.trim(),
-                                cols[1].textContent.trim(),
-                                cols[2].textContent.trim(),
-                                cols[3].textContent.trim(),
-                                cols[4].textContent.trim(),
-                                cols[5].textContent.trim(),
-                                cols[6].textContent.trim()
-
-                            ]);
-                        }
-                    });
-
-
-                    const wsExpense =
-                        XLSX.utils.aoa_to_sheet(
-                            expenseDataExcel
-                        );
-
-
-                    XLSX.utils.book_append_sheet(
-                        wb,
-                        wsExpense,
-                        'Gider'
-                    );
-
-
-                    const summaryData = [
-
-                        ['ÖZET'],
-
-                        [''],
-
-                        [
-                            'Kasa Nakit Bakiye',
-                            formatAmount(
-                                currentBalance
-                            )
-                        ],
-
-                        [
-                            'Normalde Olması Gereken Bakiye',
-                            formatAmount(
-                                fixedBalance
-                            )
-                        ],
-
-                        [''],
-                        [
-                            'Bakiye Modu',
-                            isManualMode ?
-                                'Manuel' :
-                                'Otomatik'
-                        ],
-
-                        isManualMode ?
-                            [
-                                'Manuel Başlangıç',
-                                formatAmount(
-                                    manualBaseBalance
-                                )
-                            ] :
-                            []
-                    ];
-
-
-                    const wsSummary =
-                        XLSX.utils.aoa_to_sheet(
-                            summaryData
-                        );
-
-
-                    XLSX.utils.book_append_sheet(
-                        wb,
-                        wsSummary,
-                        'Özet'
-                    );
-
-
-                    XLSX.writeFile(
-                        wb,
-                        `kasa_${getToday()}.xlsx`
-                    );
-
-
-                    setSyncStatus(
-                        '✅ Excel indirildi',
-                        'success'
-                    );
-                }
-            );
-
-
-        // ============================================================
-        // BAŞLANGIÇ
-        // ============================================================
-
-        document
-            .getElementById(
-                'salesDate'
-            )
-            .value =
-            getToday();
-
-
-        document
-            .getElementById(
-                'expenseDate'
-            )
-            .value =
-            getToday();
-
-
-        // Firebase'den manuel mod bilgisini al
-        balanceRef.on(
-            'value',
-            (snapshot) => {
-
-                const data =
-                    snapshot.val();
-
-
-                if (data) {
-
-                    currentBalance =
-                        data.balance || 0;
-
-                    isManualMode =
-                        data.isManual || false;
-
-                    manualBaseBalance =
-                        data.manualBase || 0;
-
-                    updateBalanceDisplay(
-                        currentBalance
-                    );
-                }
-            }
-        );
-
-
-        fixedBalanceRef.on(
-            'value',
-            (snapshot) => {
-
-                const data =
-                    snapshot.val();
-
-
-                if (data) {
-
-                    fixedBalance =
-                        data.balance || 0;
-
-                    updateFixedBalanceDisplay(
-                        fixedBalance
-                    );
-                }
-            }
-        );
-
-
-        updateBalanceDisplay(0);
-
-        updateFixedBalanceDisplay(0);
-
-        setSyncStatus(
-            '🔄 Yükleniyor...',
-            'syncing'
-        );
-
-
-        console.log(
-            '✅ Kasa Yönetimi başlatıldı!'
-        );
-
-        console.log(
-            '✅ IBAN/Not alanlarına tıklayarak büyütebilirsiniz.'
-        );
-
-        console.log(
-            '✅ Gelir/Gider silindiğinde bakiye otomatik güncellenir.'
-        );
-
-    </script>
-
+  </div>
+
+  <!-- ============ YÖNETİM ============ -->
+  <div class="tab-pane" id="management">
+    <div class="mgmt">
+      <section class="card">
+        <div class="card-head"><h3>Havale Alacak Kişiler</h3><span class="row-count-badge" id="recipientCount" style="margin-left:auto">0</span></div>
+        <div class="card-body">
+          <div class="add-row r2 plain">
+            <input type="text" id="newRecipientName" placeholder="Kişi adı" />
+            <input type="text" id="newRecipientNote" placeholder="Banka / IBAN / Not" />
+            <button class="btn btn-primary" id="addRecipientBtn" type="button" title="Ekle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+          </div>
+          <div id="recipientList" class="mlist"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h3>Hazır Gider Kalemleri</h3><span class="row-count-badge" id="templateCount" style="margin-left:auto">0</span></div>
+        <div class="card-body">
+          <div class="add-row r5 plain">
+            <input type="text" id="newExpenseCategory" placeholder="Kategori" list="categoryList" />
+            <input type="text" id="newExpenseProduct" placeholder="Ürün adı" />
+            <input type="text" inputmode="decimal" id="newExpenseAmount" placeholder="Tutar" />
+          </div>
+          <div class="add-row r5b plain">
+            <input type="text" id="newExpenseReceiver" placeholder="Alıcı" />
+            <input type="text" id="newExpenseNote" placeholder="Not" />
+            <button class="btn btn-primary" id="addExpenseTemplateBtn" type="button" title="Ekle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+          </div>
+          <datalist id="categoryList"></datalist>
+          <div id="expenseTemplateList" class="mlist"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>makerpazar · Kasa Yönetimi</span>
+  <span>Tüm veriler Firebase'de saklanır · Havale gelirleri kasa bakiyesini etkilemez</span>
+</footer>
+
+<!-- ============ IBAN MODAL ============ -->
+<div class="modal" id="ibanModal">
+  <div class="modal-card wide">
+    <div class="modal-head"><h3>Havale Bilgisi</h3><button class="x" id="ibanModalClose" aria-label="Kapat">×</button></div>
+    <div class="modal-body">
+      <div class="iban-label">Havale alacak kişi</div>
+      <div class="iban-name" id="ibanModalName">-</div>
+      <div class="iban-content" id="ibanModalContent" title="Tıkla: kopyala">-</div>
+      <div class="copy-hint">Metne tıklayınca seçilir ve panoya kopyalanır</div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="copyIbanBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg><span id="copyIbanText">Kopyala</span></button>
+        <button class="btn btn-ghost" id="copyAllBtn" type="button" hidden>Tüm notu kopyala</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ BAKİYE DÜZENLEME ============ -->
+<div class="modal" id="editBalanceModal">
+  <div class="modal-card">
+    <div class="modal-head"><h3>Kasa Bakiyesini Düzenle</h3><button class="x" id="closeBalanceModal" aria-label="Kapat">×</button></div>
+    <div class="modal-body">
+      <p class="info-text">Kasadaki gerçek nakit miktarını girin. Bundan sonraki nakit gelir ve giderler bu tutarın üzerine işlenir.</p>
+      <div class="bal-compare">
+        <div class="bal-box fixed"><div class="l">Normalde olması gereken</div><div class="a" id="fixedBalanceDisplay">0,00 ₺</div></div>
+        <div class="bal-box cur"><div class="l">Mevcut bakiye</div><div class="a"><span id="currentBalanceDisplay">0,00</span> ₺</div></div>
+      </div>
+      <div class="diff" id="balanceDiff"></div>
+      <div class="field">
+        <label for="manualBalanceInput">Yeni Bakiye</label>
+        <div class="iw"><span class="pre">₺</span><input type="text" inputmode="decimal" class="amount" id="manualBalanceInput" placeholder="0,00" /></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="saveManualBalance" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/></svg>Kaydet</button>
+        <button class="btn btn-ghost" id="cancelManualBalance" type="button">İptal</button>
+      </div>
+      <button class="link-btn" id="resetAutoBalance" type="button" hidden>Manuel ayarı kaldır, otomatik hesaplamaya dön</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+
+<script>
+  // ============================================================
+  // FIREBASE
+  // ============================================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyAb_2EMlUN-Kj0U24lDNhMVb91khnRa9fQ",
+    authDomain: "gelirgideryonetimi-4a479.firebaseapp.com",
+    databaseURL: "https://gelirgideryonetimi-4a479-default-rtdb.firebaseio.com",
+    projectId: "gelirgideryonetimi-4a479",
+    storageBucket: "gelirgideryonetimi-4a479.firebasestorage.app",
+    messagingSenderId: "627010832588",
+    appId: "1:627010832588:web:321b4e8634ea7bbca75a69"
+  };
+
+  let db = null;
+  try { firebase.initializeApp(firebaseConfig); db = firebase.database(); }
+  catch (e) { console.error('Firebase başlatılamadı:', e); }
+  const TS = () => firebase.database.ServerValue.TIMESTAMP;
+
+  const salesRef            = db && db.ref('gelirler');
+  const expenseRef          = db && db.ref('giderler');
+  const recipientsRef       = db && db.ref('havaleAlacakKisiler');
+  const expenseTemplatesRef = db && db.ref('hazirGiderKalemleri');
+  const balanceRef          = db && db.ref('kasaBakiye');
+  const fixedBalanceRef     = db && db.ref('normalBakiye');
+
+  // ============================================================
+  // DURUM
+  // ============================================================
+  let salesData = [], expenseData = [], recipients = [], expenseTemplates = [];
+  let currentBalance = 0, fixedBalance = 0;
+  let isManualMode = false, manualBaseBalance = 0, manualOffset = null;   // manualOffset: yeni (doğru) manuel mod
+  const loaded = { sales:false, expense:false, balance:false };
+  let lastWritten = { balance:null, fixed:null };
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const escapeHtml = esc;
+  const lower = s => String(s ?? '').toLocaleLowerCase('tr-TR');
+  const round2 = n => Math.round((+n || 0) * 100) / 100;
+
+  function formatAmount(val){
+    const n = parseFloat(val);
+    if (isNaN(n)) return '0,00';
+    return n.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  const tl = v => formatAmount(v) + ' ₺';
+
+  // "1.234,56" · "1234,56" · "1234.56" → 1234.56
+  function parseAmount(str){
+    let s = String(str ?? '').trim().replace(/\s|₺/g, '');
+    if (!s) return NaN;
+    if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+    else if ((s.match(/\./g) || []).length > 1) s = s.replace(/\./g, '');
+    return parseFloat(s);
+  }
+
+  // Yerel tarih (UTC değil — gece yarısından sonra "dün" çıkmasın)
+  function getToday(){
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  function fmtDate(s){
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || '');
+    return m ? `${m[3]}.${m[2]}.${m[1]}` : (s || '');
+  }
+  const AYLAR = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+
+  function toast(msg, type = '', ms = 2400){
+    const t = $('toast'); t.textContent = msg; t.className = 'toast show' + (type ? ' ' + type : '');
+    clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), ms);
+  }
+  // Eski koddaki durum mesajları artık bildirim olarak çıkar
+  function setSyncStatus(text, type = 'success'){ if (type !== 'syncing') toast(text.replace(/^✅\s*/, ''), type === 'error' ? 'err' : ''); }
+  function requireDb(){ if (!db){ toast('Firebase bağlantısı yok — işlem yapılamadı', 'err', 3500); return false; } return true; }
+  function setChip(state, text){
+    $('syncChip').className = 'chip' + (state === 'ok' ? '' : state === 'wait' ? ' wait' : ' off');
+    $('syncStatus').textContent = text; $('syncChip').title = text;
+  }
+
+  // ============================================================
+  // BAKİYE
+  // Kural: yalnızca NAKİT gelir kasaya girer, tüm giderler kasadan çıkar.
+  // ============================================================
+  function totals(){
+    let nakit = 0, gider = 0;
+    salesData.forEach(i => { if (i.odeme === 'Nakit') nakit += parseFloat(i.tutar) || 0; });
+    expenseData.forEach(i => { gider += parseFloat(i.tutar) || 0; });
+    return { nakit: round2(nakit), gider: round2(gider), net: round2(nakit - gider) };
+  }
+  function calculateBalance(){
+    const t = totals();
+    if (!isManualMode) return t.net;
+    if (manualOffset !== null) return round2(manualOffset + t.net);   // yeni manuel mod
+    return round2(manualBaseBalance + t.net);                          // eski kayıtlar (geriye uyumluluk)
+  }
+
+  function updateBalanceDisplay(balance){
+    $('balanceBadge').textContent = tl(balance);
+    $('balanceBadge').classList.toggle('neg', balance < 0);
+    $('currentBalanceDisplay').textContent = formatAmount(balance);
+    $('statCash').textContent = tl(balance);
+    $('modeTag').hidden = !isManualMode;
+    $('statCashSub').innerHTML = isManualMode
+      ? `Manuel ayarlı · olması gereken <b>${esc(formatAmount(fixedBalance))}</b>`
+      : 'Nakit gelir − gider (otomatik)';
+  }
+  function updateFixedBalanceDisplay(balance){ $('fixedBalanceDisplay').textContent = tl(balance); }
+
+  function refreshBalance(){
+    const t = totals();
+    currentBalance = calculateBalance();
+    fixedBalance = t.net;
+    updateBalanceDisplay(currentBalance);
+    updateFixedBalanceDisplay(fixedBalance);
+
+    // Tüm veriler en az bir kez yüklenmeden ve değer değişmeden Firebase'e yazma
+    if (!db || !loaded.sales || !loaded.expense || !loaded.balance) return;
+    if (lastWritten.balance !== currentBalance){
+      lastWritten.balance = currentBalance;
+      balanceRef.update({ balance: currentBalance, updatedAt: TS() });
+    }
+    if (lastWritten.fixed !== fixedBalance){
+      lastWritten.fixed = fixedBalance;
+      fixedBalanceRef.set({ balance: fixedBalance, updatedAt: TS() });
+    }
+  }
+
+  // ============================================================
+  // BAKİYE DÜZENLEME
+  // ============================================================
+  const editBalanceModal = $('editBalanceModal'), manualBalanceInput = $('manualBalanceInput');
+  function openEditModal(){
+    manualBalanceInput.value = '';
+    $('currentBalanceDisplay').textContent = formatAmount(currentBalance);
+    updateFixedBalanceDisplay(fixedBalance);
+    const d = round2(currentBalance - fixedBalance);
+    $('balanceDiff').textContent = d ? `Kasa, olması gerekenden ${formatAmount(Math.abs(d))} ₺ ${d > 0 ? 'fazla' : 'eksik'}.` : '';
+    $('balanceDiff').classList.toggle('show', !!d);
+    $('resetAutoBalance').hidden = !isManualMode;
+    editBalanceModal.classList.add('active');
+    setTimeout(() => manualBalanceInput.focus(), 100);
+  }
+  function closeEditModal(){ editBalanceModal.classList.remove('active'); }
+
+  function saveManualBalance(){
+    if (!requireDb()) return;
+    const val = round2(parseAmount(manualBalanceInput.value));
+    if (isNaN(val) || val < 0){ toast('Geçerli bir sayı giriniz (0 veya pozitif)', 'err'); return; }
+    const t = totals();
+    isManualMode = true;
+    manualBaseBalance = val;
+    manualOffset = round2(val - t.net);       // girilen tutar = şu anki kasa
+    currentBalance = val;
+    lastWritten.balance = val;
+    updateBalanceDisplay(val);
+    balanceRef.set({ balance: val, isManual: true, manualBase: val, manualOffset, updatedAt: TS() });
+    closeEditModal();
+    toast(`Bakiye ${formatAmount(val)} ₺ olarak ayarlandı (manuel)`);
+  }
+  function resetAutoBalance(){
+    if (!requireDb()) return;
+    if (!confirm('Manuel bakiye kaldırılsın ve kasa yeniden "nakit gelir − gider" olarak hesaplansın mı?')) return;
+    isManualMode = false; manualOffset = null; manualBaseBalance = 0;
+    const b = totals().net;
+    lastWritten.balance = b;
+    balanceRef.set({ balance: b, isManual: false, updatedAt: TS() });
+    refreshBalance();
+    closeEditModal();
+    toast('Otomatik hesaplamaya dönüldü');
+  }
+
+  // ============================================================
+  // IBAN MODAL
+  // ============================================================
+  const ibanModal = $('ibanModal');
+  let ibanOnly = '', ibanFull = '';
+  function showIbanModal(name, content){
+    $('ibanModalName').textContent = name;
+    ibanFull = content || '';
+    $('ibanModalContent').textContent = content || '(Not girilmemiş)';
+    const m = /TR\s*\d{2}(?:\s*\d){22}/i.exec(ibanFull);
+    ibanOnly = m ? m[0].replace(/\s/g, '').toUpperCase() : '';
+    $('copyIbanText').textContent = ibanOnly ? "IBAN'ı kopyala" : 'Kopyala';
+    $('copyAllBtn').hidden = !ibanOnly || ibanOnly === ibanFull.replace(/\s/g, '').toUpperCase();
+    ibanModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeIbanModal(){ ibanModal.classList.remove('active'); document.body.style.overflow = ''; }
+  function copyText(text, label){
+    if (!text) return;
+    (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+      .then(() => toast(`${label} kopyalandı`))
+      .catch(() => toast('Kopyalanamadı — metni seçip Ctrl+C ile kopyalayın'));
+  }
+
+  // ============================================================
+  // DÖNEM FİLTRESİ
+  // ============================================================
+  const periodSelect = $('periodSelect');
+  const inPeriod = item => !periodSelect.value || (item.tarih || '').startsWith(periodSelect.value);
+  function fillPeriods(){
+    const cur = periodSelect.value;
+    const months = new Set();
+    [...salesData, ...expenseData].forEach(i => { const m = /^(\d{4}-\d{2})/.exec(i.tarih || ''); if (m) months.add(m[1]); });
+    months.add(getToday().slice(0, 7));
+    const list = [...months].sort().reverse();
+    periodSelect.innerHTML = '<option value="">Tüm zamanlar</option>' + list.map(m => {
+      const [y, mo] = m.split('-');
+      return `<option value="${m}">${AYLAR[+mo - 1]} ${y}</option>`;
+    }).join('');
+    periodSelect.value = list.includes(cur) ? cur : '';
+  }
+  function renderStats(){
+    let inC = 0, inB = 0, out = 0, outN = 0;
+    salesData.filter(inPeriod).forEach(i => { const v = parseFloat(i.tutar) || 0; i.odeme === 'Nakit' ? inC += v : inB += v; });
+    expenseData.filter(inPeriod).forEach(i => { out += parseFloat(i.tutar) || 0; outN++; });
+    $('statIn').textContent = tl(inC + inB);
+    $('statInCash').textContent = formatAmount(inC);
+    $('statInBank').textContent = formatAmount(inB);
+    $('statOut').textContent = tl(out);
+    $('statOutCount').textContent = outN;
+    const net = round2(inC + inB - out);
+    $('statNet').textContent = tl(net);
+    $('statNet').style.color = net < 0 ? 'var(--out)' : 'var(--ink)';
+    $('tabSalesC').textContent = salesData.length;
+    $('tabExpC').textContent = expenseData.length;
+  }
+
+  // ============================================================
+  // GELİR
+  // ============================================================
+  const salesBody = $('salesBody'), salesSearch = $('salesSearch'), salesRowCount = $('salesRowCount');
+  const DEL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+
+  function renderSales(){
+    const q = lower(salesSearch.value.trim()), pf = $('salesPayFilter').value;
+    const list = salesData.filter(i => inPeriod(i) && (!pf || i.odeme === pf) &&
+      (!q || [i.musteri, i.urun, i.odeme, i.havaleAlan, formatAmount(i.tutar), fmtDate(i.tarih)].some(v => lower(v).includes(q))));
+    const filtered = list.length !== salesData.length;
+    salesRowCount.textContent = filtered ? `${list.length} / ${salesData.length} satır` : `${salesData.length} satır`;
+    if (!list.length){
+      salesBody.innerHTML = `<tr class="empty"><td colspan="8">${salesData.length ? 'Filtreye uyan gelir yok' : 'Henüz gelir kaydı yok'}</td></tr>`;
+      $('salesFootSum').textContent = tl(0); $('salesFootL').textContent = 'Toplam';
+      return;
+    }
+    let sum = 0, cash = 0;
+    salesBody.innerHTML = list.map((item, index) => {
+      const v = parseFloat(item.tutar) || 0; sum += v; if (item.odeme === 'Nakit') cash += v;
+      const havale = item.odeme === 'Havale';
+      return `<tr>
+        <td class="idx">${index + 1}</td>
+        <td class="strong" data-label="Müşteri">${esc(item.musteri || '(isimsiz)')}</td>
+        <td data-label="Ürün"><span class="product-badge">${esc(item.urun || '(ürün yok)')}</span></td>
+        <td data-label="Ödeme"><span class="type-badge ${havale ? 'havale' : 'nakit'}">${esc(item.odeme || 'Nakit')}</span></td>
+        <td data-label="Havale Alan">${havale ? esc(item.havaleAlan || '—') : '<span class="dash">—</span>'}</td>
+        <td class="amt in" data-label="Tutar">${tl(v)}</td>
+        <td class="date" data-label="Tarih">${esc(fmtDate(item.tarih))}</td>
+        <td class="act"><button class="icon-btn" data-del="${esc(item.id)}" title="Sil">${DEL}</button></td>
+      </tr>`;
+    }).join('');
+    $('salesFootL').textContent = `Toplam (${list.length})  ·  Nakit ${formatAmount(cash)} ₺`;
+    $('salesFootSum').textContent = tl(sum);
+  }
+
+  // Ödeme seçimi (gizli select korunur — eski kod uyumu)
+  const salesPayment = $('salesPayment'), salesHavaleNote = $('salesHavaleNote');
+  function setPayment(v){
+    salesPayment.value = v;
+    document.querySelectorAll('#paySeg button').forEach(b => b.classList.toggle('active', b.dataset.v === v));
+    toggleSalesHavale();
+  }
+  function toggleSalesHavale(){
+    const h = salesPayment.value === 'Havale';
+    salesHavaleNote.disabled = !h;
+    if (!h) salesHavaleNote.value = '';
+    salesHavaleNote.placeholder = h ? 'Havale alacak kişi bilgisi' : 'Havale seçili değil';
+    $('payHint').textContent = h ? 'Havale geliri kasa bakiyesini etkilemez.' : 'Nakit gelir kasa bakiyesine eklenir.';
+  }
+
+  function addSales(){
+    if (!requireDb()) return;
+    const musteri = $('salesCustomer').value.trim() || '(isimsiz)';
+    const urun = $('salesProduct').value.trim() || '(ürün yok)';
+    const odeme = salesPayment.value;
+    const tarih = $('salesDate').value || getToday();
+    const havaleAlan = odeme === 'Havale' ? (salesHavaleNote.value.trim() || '(havale bilgisi yok)') : '—';
+    const tutar = round2(parseAmount($('salesAmount').value));
+    if (!tutar || tutar <= 0){ toast('Geçerli bir tutar giriniz', 'err'); $('salesAmount').focus(); return; }
+    $('addSalesBtn').disabled = true;
+    salesRef.push({ musteri, urun, odeme, tarih, havaleAlan, tutar, createdAt: TS() })
+      .then(() => {
+        toast(`Gelir eklendi · ${tl(tutar)}${odeme === 'Havale' ? ' (havale)' : ''}`);
+        $('salesCustomer').value = ''; $('salesProduct').value = ''; $('salesAmount').value = '';
+        if (odeme === 'Havale') salesHavaleNote.value = '';
+        $('salesDate').value = getToday();
+        $('salesCustomer').focus();
+      })
+      .catch(err => toast('Kayıt hatası: ' + err.message, 'err', 4000))
+      .finally(() => { $('addSalesBtn').disabled = false; });
+  }
+
+  // ============================================================
+  // GİDER
+  // ============================================================
+  const expenseBody = $('expenseBody'), expenseSearch = $('expenseSearch'), expenseRowCount = $('expenseRowCount');
+
+  function renderExpenses(){
+    const q = lower(expenseSearch.value.trim()), cf = $('expenseCatFilter').value;
+    const list = expenseData.filter(i => inPeriod(i) && (!cf || i.kategori === cf) &&
+      (!q || [i.kategori, i.urun, i.alici, i.not, formatAmount(i.tutar), fmtDate(i.tarih)].some(v => lower(v).includes(q))));
+    const filtered = list.length !== expenseData.length;
+    expenseRowCount.textContent = filtered ? `${list.length} / ${expenseData.length} satır` : `${expenseData.length} satır`;
+    if (!list.length){
+      expenseBody.innerHTML = `<tr class="empty"><td colspan="8">${expenseData.length ? 'Filtreye uyan gider yok' : 'Henüz gider kaydı yok'}</td></tr>`;
+      $('expenseFootSum').textContent = tl(0); $('expenseFootL').textContent = 'Toplam';
+      return;
+    }
+    let sum = 0;
+    expenseBody.innerHTML = list.map((item, index) => {
+      const v = parseFloat(item.tutar) || 0; sum += v;
+      const note = item.not && item.not !== '—' ? item.not : '';
+      return `<tr>
+        <td class="idx">${index + 1}</td>
+        <td data-label="Kategori"><span class="cat-badge">${esc(item.kategori || '(kategori yok)')}</span></td>
+        <td class="strong" data-label="Ürün/Hizmet">${esc(item.urun || '(ürün yok)')}</td>
+        <td data-label="Alıcı">${esc(item.alici || '(alıcı yok)')}</td>
+        <td class="amt out" data-label="Tutar">${tl(v)}</td>
+        <td class="date" data-label="Tarih">${esc(fmtDate(item.tarih))}</td>
+        <td class="note" data-label="Not" title="${esc(note)}">${note ? esc(note) : '<span class="dash">—</span>'}</td>
+        <td class="act"><button class="icon-btn" data-del="${esc(item.id)}" title="Sil">${DEL}</button></td>
+      </tr>`;
+    }).join('');
+    $('expenseFootL').textContent = `Toplam (${list.length})`;
+    $('expenseFootSum').textContent = tl(sum);
+  }
+
+  function ensureCategoryOption(v){
+    const sel = $('expenseCategory');
+    if (v && ![...sel.options].some(o => o.value === v)){
+      const o = document.createElement('option'); o.value = v; o.textContent = v; sel.insertBefore(o, sel.lastElementChild);
+    }
+  }
+
+  function addExpense(){
+    if (!requireDb()) return;
+    const kategori = $('expenseCategory').value;
+    const urun = $('expenseProduct').value.trim() || '(ürün yok)';
+    const alici = $('expenseReceiver').value.trim() || '(alıcı yok)';
+    const tarih = $('expenseDate').value || getToday();
+    const not = $('expenseNote').value.trim() || '—';
+    const tutar = round2(parseAmount($('expenseAmount').value));
+    if (!tutar || tutar <= 0){ toast('Geçerli bir tutar giriniz', 'err'); $('expenseAmount').focus(); return; }
+    $('addExpenseBtn').disabled = true;
+    expenseRef.push({ kategori, urun, alici, tarih, not, tutar, createdAt: TS() })
+      .then(() => {
+        toast(`Gider eklendi · ${tl(tutar)}`);
+        $('expenseProduct').value = ''; $('expenseReceiver').value = ''; $('expenseAmount').value = ''; $('expenseNote').value = '';
+        $('expenseDate').value = getToday();
+      })
+      .catch(err => toast('Kayıt hatası: ' + err.message, 'err', 4000))
+      .finally(() => { $('addExpenseBtn').disabled = false; });
+  }
+
+  function fillFilters(){
+    // Gider kategori filtresi
+    const cf = $('expenseCatFilter'), cur = cf.value;
+    const cats = [...new Set(expenseData.map(i => i.kategori).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'tr'));
+    cf.innerHTML = '<option value="">Tüm kategoriler</option>' + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+    cf.value = cats.includes(cur) ? cur : '';
+    // Otomatik tamamlama listeleri
+    const uniq = arr => [...new Set(arr.filter(v => v && !/^\(.*\)$/.test(v) && v !== '—'))].slice(0, 200);
+    $('customerList').innerHTML = uniq(salesData.map(i => i.musteri)).map(v => `<option value="${esc(v)}">`).join('');
+    $('productList').innerHTML = uniq(salesData.map(i => i.urun)).map(v => `<option value="${esc(v)}">`).join('');
+    $('receiverList').innerHTML = uniq(expenseData.map(i => i.alici)).map(v => `<option value="${esc(v)}">`).join('');
+    const allCats = uniq([...[...$('expenseCategory').options].map(o => o.value), ...cats, ...expenseTemplates.map(t => t.kategori)]);
+    $('categoryList').innerHTML = allCats.map(v => `<option value="${esc(v)}">`).join('');
+  }
+
+  function renderAll(){ fillPeriods(); fillFilters(); renderStats(); renderSales(); renderExpenses(); }
+
+  // ============================================================
+  // HAVALE ALICILARI
+  // ============================================================
+  const initials = s => String(s || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toLocaleUpperCase('tr-TR');
+  const IBAN_IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 10 12 4l9 6M5 10v8M19 10v8M3 20h18"/></svg>';
+
+  function renderRecipients(){
+    const container = $('recipientList'), tags = $('recipientTagsContainer');
+    $('recipientCount').textContent = recipients.length;
+    if (!recipients.length){
+      container.innerHTML = '<span class="muted">Henüz kişi eklenmemiş.</span>';
+      tags.innerHTML = '<span class="muted">Yönetim sekmesinden kişi ekleyin.</span>';
+      return;
+    }
+    container.innerHTML = recipients.map(r => `
+      <div class="management-tag">
+        <span class="avatar">${esc(initials(r.name))}</span>
+        <div class="main">
+          <div class="name">${esc(r.name)}</div>
+          <div class="meta">${r.note && r.note.trim() ? `<button class="bank-info" type="button" data-iban="${esc(r.id)}" title="Büyüt / kopyala">${IBAN_IC}${esc(r.note)}</button>` : '<span>Not yok</span>'}</div>
+        </div>
+        <button class="icon-btn" type="button" data-del-recipient="${esc(r.id)}" title="Sil">${DEL}</button>
+      </div>`).join('');
+    tags.innerHTML = recipients.map(r => `<button type="button" class="qtag" data-recipient="${esc(r.id)}">${esc(r.name)}</button>`).join('');
+  }
+
+  function addRecipient(){
+    if (!requireDb()) return;
+    const name = $('newRecipientName').value.trim(), note = $('newRecipientNote').value.trim();
+    if (!name){ toast('Kişi adı giriniz', 'err'); $('newRecipientName').focus(); return; }
+    recipientsRef.push({ name, note }).then(() => {
+      toast('Kişi eklendi');
+      $('newRecipientName').value = ''; $('newRecipientNote').value = ''; $('newRecipientName').focus();
+    }).catch(err => toast('Hata: ' + err.message, 'err'));
+  }
+
+  // ============================================================
+  // HAZIR GİDER KALEMLERİ
+  // ============================================================
+  function renderExpenseTemplates(){
+    const container = $('expenseTemplateList'), tags = $('expenseTagsContainer');
+    $('templateCount').textContent = expenseTemplates.length;
+    if (!expenseTemplates.length){
+      container.innerHTML = '<span class="muted">Henüz gider kalemi eklenmemiş.</span>';
+      tags.innerHTML = '<span class="muted">Yönetim sekmesinden gider kalemi ekleyin.</span>';
+      return;
+    }
+    container.innerHTML = expenseTemplates.map(e => `
+      <div class="management-tag">
+        <span class="avatar exp">${esc(initials(e.kategori))}</span>
+        <div class="main">
+          <div class="name">${esc(e.urun)}</div>
+          <div class="meta"><span class="cat-badge">${esc(e.kategori)}</span>${e.alici ? `<span>${esc(e.alici)}</span>` : ''}${e.not ? `<span>· ${esc(e.not)}</span>` : ''}</div>
+        </div>
+        <span class="price">${tl(e.tutar)}</span>
+        <button class="icon-btn" type="button" data-del-template="${esc(e.id)}" title="Sil">${DEL}</button>
+      </div>`).join('');
+    tags.innerHTML = expenseTemplates.map(e =>
+      `<button type="button" class="qtag exp" data-template="${esc(e.id)}">${esc(e.urun)} <span class="a">${formatAmount(e.tutar)}₺</span></button>`).join('');
+  }
+
+  function useTemplate(e){
+    ensureCategoryOption(e.kategori);
+    $('expenseCategory').value = e.kategori;
+    $('expenseProduct').value = e.urun;
+    $('expenseAmount').value = formatAmount(e.tutar);
+    $('expenseReceiver').value = e.alici || '';
+    $('expenseNote').value = e.not || '';
+    $('expenseAmount').focus();
+    toast(`"${e.urun}" forma dolduruldu — Enter ile ekleyin`);
+  }
+
+  function addExpenseTemplate(){
+    if (!requireDb()) return;
+    const kategori = $('newExpenseCategory').value.trim(), urun = $('newExpenseProduct').value.trim();
+    const tutar = round2(parseAmount($('newExpenseAmount').value));
+    const alici = $('newExpenseReceiver').value.trim(), not = $('newExpenseNote').value.trim();
+    if (!kategori || !urun || !tutar || tutar <= 0){ toast('Kategori, ürün adı ve geçerli bir tutar giriniz', 'err'); return; }
+    expenseTemplatesRef.push({ kategori, urun, tutar, alici, not }).then(() => {
+      toast('Gider kalemi eklendi');
+      ['newExpenseCategory','newExpenseProduct','newExpenseAmount','newExpenseReceiver','newExpenseNote'].forEach(id => $(id).value = '');
+      $('newExpenseCategory').focus();
+    }).catch(err => toast('Hata: ' + err.message, 'err'));
+  }
+
+  // ============================================================
+  // EXCEL (tüm kayıtlar — seçili dönem varsa yalnızca o dönem)
+  // ============================================================
+  function exportExcel(){
+    const per = periodSelect.value;
+    const perLabel = per ? periodSelect.options[periodSelect.selectedIndex].text : 'Tüm zamanlar';
+    const S = salesData.filter(inPeriod), E = expenseData.filter(inPeriod);
+    const sum = (arr, f) => round2(arr.filter(f || (() => true)).reduce((a, i) => a + (parseFloat(i.tutar) || 0), 0));
+
+    const salesRows = [['#','Müşteri','Ürün','Ödeme Türü','Havale Alan','Tutar (₺)','Tarih']]
+      .concat(S.map((i, n) => [n + 1, i.musteri || '', i.urun || '', i.odeme || '', i.odeme === 'Havale' ? (i.havaleAlan || '') : '—', round2(i.tutar), fmtDate(i.tarih)]));
+    const expRows = [['#','Kategori','Ürün/Hizmet','Alıcı','Tutar (₺)','Tarih','Not']]
+      .concat(E.map((i, n) => [n + 1, i.kategori || '', i.urun || '', i.alici || '', round2(i.tutar), fmtDate(i.tarih), i.not || '']));
+    const summary = [
+      ['ÖZET', perLabel], [''],
+      ['Kasa Nakit Bakiye', currentBalance],
+      ['Normalde Olması Gereken Bakiye', fixedBalance],
+      [''],
+      ['Gelir (Nakit)', sum(S, i => i.odeme === 'Nakit')],
+      ['Gelir (Havale)', sum(S, i => i.odeme === 'Havale')],
+      ['Gider', sum(E)],
+      ['Net', round2(sum(S) - sum(E))],
+      [''],
+      ['Bakiye Modu', isManualMode ? 'Manuel' : 'Otomatik']
+    ];
+    if (isManualMode) summary.push(['Manuel Başlangıç', manualBaseBalance]);
+    const fname = `kasa_${per || getToday()}`;
+
+    if (typeof XLSX === 'undefined'){
+      // Excel kütüphanesi yüklenemezse CSV
+      const cell = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+      const block = (title, rows) => [cell(title)].concat(rows.map(r => r.map(v => typeof v === 'number' ? String(v).replace('.', ',') : cell(v)).join(';'))).join('\r\n');
+      const csv = [block('GELİR', salesRows), '', block('GİDER', expRows), '', block('ÖZET', summary)].join('\r\n');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
+      a.download = fname + '.csv'; document.body.appendChild(a); a.click(); a.remove();
+      toast('Excel kütüphanesi yüklenemedi — CSV olarak indirildi');
+      return;
+    }
+    const wb = XLSX.utils.book_new();
+    const sheet = (rows, widths, moneyCols) => {
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      ws['!cols'] = widths.map(w => ({ wch: w }));
+      for (let r = 1; r < rows.length; r++) moneyCols.forEach(c => {
+        const ref = XLSX.utils.encode_cell({ r, c });
+        if (ws[ref] && typeof ws[ref].v === 'number') ws[ref].z = '#,##0.00 "₺"';
+      });
+      return ws;
+    };
+    XLSX.utils.book_append_sheet(wb, sheet(salesRows, [5, 24, 24, 12, 22, 14, 12], [5]), 'Gelir');
+    XLSX.utils.book_append_sheet(wb, sheet(expRows, [5, 16, 24, 22, 14, 12, 30], [4]), 'Gider');
+    XLSX.utils.book_append_sheet(wb, sheet(summary, [32, 18], [1]), 'Özet');
+    XLSX.writeFile(wb, fname + '.xlsx');
+    toast('Excel indirildi');
+  }
+
+  // ============================================================
+  // FIREBASE DİNLEYİCİLERİ
+  // ============================================================
+  const toList = data => data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+  const byDateDesc = (a, b) => (b.tarih || '').localeCompare(a.tarih || '') || ((b.createdAt || 0) - (a.createdAt || 0));
+
+  function startListeners(){
+    if (!db){
+      setChip('off', 'Firebase yüklenemedi');
+      ['salesBody','expenseBody'].forEach(id => $(id).innerHTML = '<tr class="empty"><td colspan="8">Firebase yüklenemedi. İnternet bağlantınızı kontrol edip sayfayı yenileyin.</td></tr>');
+      return;
+    }
+    db.ref('.info/connected').on('value', s => s.val() === true ? setChip('ok', 'Senkronize') : setChip('off', 'Bağlantı yok'));
+    const onErr = what => err => { console.error(what, err); setChip('off', 'Okuma hatası'); toast(`${what} yüklenemedi: ${err.message}`, 'err', 5000); };
+
+    balanceRef.on('value', snap => {
+      const d = snap.val();
+      if (d){
+        isManualMode = !!d.isManual;
+        manualBaseBalance = d.manualBase || 0;
+        manualOffset = (d.isManual && typeof d.manualOffset === 'number') ? d.manualOffset : null;
+        if (!loaded.sales || !loaded.expense){ currentBalance = d.balance || 0; updateBalanceDisplay(currentBalance); }
+        lastWritten.balance = d.balance ?? null;
+      }
+      loaded.balance = true;
+      refreshBalance();
+    }, onErr('Bakiye'));
+
+    fixedBalanceRef.on('value', snap => {
+      const d = snap.val();
+      if (d) lastWritten.fixed = d.balance ?? null;
+    });
+
+    salesRef.on('value', snap => {
+      salesData = toList(snap.val()).sort(byDateDesc);
+      loaded.sales = true;
+      renderAll(); refreshBalance();
+    }, onErr('Gelirler'));
+
+    expenseRef.on('value', snap => {
+      expenseData = toList(snap.val()).sort(byDateDesc);
+      loaded.expense = true;
+      renderAll(); refreshBalance();
+    }, onErr('Giderler'));
+
+    recipientsRef.on('value', snap => { recipients = toList(snap.val()).sort((a, b) => String(a.name).localeCompare(String(b.name), 'tr')); renderRecipients(); }, onErr('Kişiler'));
+    expenseTemplatesRef.on('value', snap => { expenseTemplates = toList(snap.val()); renderExpenseTemplates(); fillFilters(); }, onErr('Gider kalemleri'));
+  }
+
+  // ============================================================
+  // OLAYLAR
+  // ============================================================
+  // Sekmeler
+  function showTab(name){
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === name));
+    try { localStorage.setItem('kasa_tab', name); } catch(e){}
+  }
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab)));
+  try { const t = localStorage.getItem('kasa_tab'); if (t && $(t)) showTab(t); } catch(e){}
+
+  $('balanceCounter').addEventListener('click', openEditModal);
+  $('cashStat').addEventListener('click', openEditModal);
+  $('saveManualBalance').addEventListener('click', saveManualBalance);
+  $('cancelManualBalance').addEventListener('click', closeEditModal);
+  $('closeBalanceModal').addEventListener('click', closeEditModal);
+  $('resetAutoBalance').addEventListener('click', resetAutoBalance);
+  manualBalanceInput.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); saveManualBalance(); } });
+  editBalanceModal.addEventListener('click', e => { if (e.target === editBalanceModal) closeEditModal(); });
+
+  $('ibanModalClose').addEventListener('click', closeIbanModal);
+  ibanModal.addEventListener('click', e => { if (e.target === ibanModal) closeIbanModal(); });
+  $('ibanModalContent').addEventListener('click', () => {
+    const r = document.createRange(); r.selectNodeContents($('ibanModalContent'));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    copyText(ibanFull, 'Metin');
+  });
+  $('copyIbanBtn').addEventListener('click', () => copyText(ibanOnly || ibanFull, ibanOnly ? 'IBAN' : 'Metin'));
+  $('copyAllBtn').addEventListener('click', () => copyText(ibanFull, 'Not'));
+
+  // Gelir
+  document.querySelectorAll('#paySeg button').forEach(b => b.addEventListener('click', () => setPayment(b.dataset.v)));
+  salesPayment.addEventListener('change', toggleSalesHavale);
+  $('addSalesBtn').addEventListener('click', addSales);
+  $('salesForm').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.tagName === 'INPUT'){ e.preventDefault(); addSales(); } });
+  salesSearch.addEventListener('input', renderSales);
+  $('salesPayFilter').addEventListener('change', renderSales);
+  $('recipientTagsContainer').addEventListener('click', e => {
+    const b = e.target.closest('[data-recipient]'); if (!b) return;
+    const r = recipients.find(x => x.id === b.dataset.recipient); if (!r) return;
+    setPayment('Havale');
+    salesHavaleNote.value = r.name;
+  });
+  salesBody.addEventListener('click', e => {
+    const b = e.target.closest('[data-del]'); if (!b || !requireDb()) return;
+    const it = salesData.find(x => x.id === b.dataset.del);
+    if (confirm(`${it ? `${it.musteri} · ${tl(it.tutar)}\n\n` : ''}Bu gelir kaydını silmek istediğinize emin misiniz?`))
+      salesRef.child(b.dataset.del).remove().then(() => toast('Gelir silindi')).catch(err => toast('Silinemedi: ' + err.message, 'err'));
+  });
+  $('clearSalesBtn').addEventListener('click', () => {
+    if (!salesData.length || !requireDb()) return;
+    if (confirm(`TÜM gelir kayıtları (${salesData.length} adet) silinsin mi?`) && confirm('Bu işlem geri alınamaz. Emin misiniz?'))
+      salesRef.remove().then(() => toast('Tüm gelir kayıtları silindi'));
+  });
+
+  // Gider
+  $('addExpenseBtn').addEventListener('click', addExpense);
+  $('expenseForm').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.tagName === 'INPUT'){ e.preventDefault(); addExpense(); } });
+  expenseSearch.addEventListener('input', renderExpenses);
+  $('expenseCatFilter').addEventListener('change', renderExpenses);
+  $('expenseTagsContainer').addEventListener('click', e => {
+    const b = e.target.closest('[data-template]'); if (!b) return;
+    const t = expenseTemplates.find(x => x.id === b.dataset.template); if (t) useTemplate(t);
+  });
+  expenseBody.addEventListener('click', e => {
+    const b = e.target.closest('[data-del]'); if (!b || !requireDb()) return;
+    const it = expenseData.find(x => x.id === b.dataset.del);
+    if (confirm(`${it ? `${it.urun} · ${tl(it.tutar)}\n\n` : ''}Bu gider kaydını silmek istediğinize emin misiniz?`))
+      expenseRef.child(b.dataset.del).remove().then(() => toast('Gider silindi')).catch(err => toast('Silinemedi: ' + err.message, 'err'));
+  });
+  $('clearExpenseBtn').addEventListener('click', () => {
+    if (!expenseData.length || !requireDb()) return;
+    if (confirm(`TÜM gider kayıtları (${expenseData.length} adet) silinsin mi?`) && confirm('Bu işlem geri alınamaz. Emin misiniz?'))
+      expenseRef.remove().then(() => toast('Tüm gider kayıtları silindi'));
+  });
+
+  // Yönetim
+  $('addRecipientBtn').addEventListener('click', addRecipient);
+  ['newRecipientName','newRecipientNote'].forEach(id => $(id).addEventListener('keydown', e => { if (e.key === 'Enter') addRecipient(); }));
+  $('recipientList').addEventListener('click', e => {
+    const i = e.target.closest('[data-iban]');
+    if (i){ const r = recipients.find(x => x.id === i.dataset.iban); if (r) showIbanModal(r.name, r.note); return; }
+    const d = e.target.closest('[data-del-recipient]');
+    if (d && requireDb() && confirm('Bu kişiyi silmek istediğinize emin misiniz?')) recipientsRef.child(d.dataset.delRecipient).remove();
+  });
+  $('addExpenseTemplateBtn').addEventListener('click', addExpenseTemplate);
+  ['newExpenseCategory','newExpenseProduct','newExpenseAmount','newExpenseReceiver','newExpenseNote'].forEach(id =>
+    $(id).addEventListener('keydown', e => { if (e.key === 'Enter') addExpenseTemplate(); }));
+  $('expenseTemplateList').addEventListener('click', e => {
+    const d = e.target.closest('[data-del-template]');
+    if (d && requireDb() && confirm('Bu gider kalemini silmek istediğinize emin misiniz?')) expenseTemplatesRef.child(d.dataset.delTemplate).remove();
+  });
+
+  periodSelect.addEventListener('change', () => { renderStats(); renderSales(); renderExpenses(); });
+  $('exportExcel').addEventListener('click', exportExcel);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape'){ closeIbanModal(); closeEditModal(); } });
+
+  // ============================================================
+  // BAŞLANGIÇ
+  // ============================================================
+  $('salesDate').value = getToday();
+  $('expenseDate').value = getToday();
+  toggleSalesHavale();
+  updateBalanceDisplay(0);
+  updateFixedBalanceDisplay(0);
+  renderAll();
+  startListeners();
+</script>
 </body>
 </html>
